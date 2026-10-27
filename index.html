@@ -89,7 +89,7 @@
 <header>
   <div>
     <h1>中国林业资源大数据分析 · 2015–2024</h1>
-    <div class="sub">基于国家统计局、国家林业和草原局、中国林业信息网等权威公开数据，对近十年我国森林资源规模、木材生产、林业产业与造林结构进行交互式可视化。共 21 类高级图表 + 数据总表，拖动时间轴可联动仪表盘与年份快照，并附自包含动画演示。</div>
+    <div class="sub">基于国家统计局、国家林业和草原局、中国林业信息网等权威公开数据，对近十年我国森林资源规模、木材生产、林业产业与造林结构进行交互式可视化。共 26 类高级图表 + 数据总表，拖动时间轴可联动仪表盘与年份快照，并附自包含动画演示。</div>
   </div>
   <div class="badge" id="upd">数据更新：2026-10-27</div>
 </header>
@@ -104,7 +104,8 @@
   <a href="#c13">⑬象形柱</a><a href="#c14">⑭箱线</a><a href="#c15">⑮平行</a>
   <a href="#c16">⑯气泡</a><a href="#c17">⑰漏斗</a>
   <a href="#c18">⑱玫瑰</a><a href="#c19">⑲树图</a><a href="#c20">⑳世界对比</a>
-  <a href="#c21">㉑综合指数</a>
+  <a href="#c21">㉑综合</a><a href="#c22">㉒累计</a><a href="#c23">㉓目标</a>
+  <a href="#c24">㉔相关</a><a href="#c25">㉕产业</a><a href="#c26">㉖省排序</a>
   <a href="#story">数据故事</a><a href="#tables">数据总表</a>
 </nav>
 
@@ -259,6 +260,41 @@
   <h2><span class="dot"></span>㉑ 林业发展综合指数（2015 = 100）</h2>
   <div class="desc">将产值、木材产量、森林蓄积量、森林覆盖率四项核心指标以 2015 年为基准（=100）归一化，观察“增绿”与“增收”的同步跃升。四条曲线整体向上，说明生态与产业十年协同走强。</div>
   <div id="indexChart" class="chart" style="height:440px"></div>
+</section>
+
+<!-- ㉒ 累计造林面积 阶梯面积图 -->
+<section class="card" style="margin-top:18px" id="c22">
+  <h2><span class="dot"></span>㉒ 十年累计造林面积 · 阶梯面积图</h2>
+  <div class="desc">对 2015–2024 年各年造林面积做累计求和，呈现"十年累计造林"的总量轨迹（注意 2021 起口径调整，跨段仅作趋势参考）。阶梯面积强调"逐年累加"的累积效应。</div>
+  <div id="cumAffChart" class="chart" style="height:420px"></div>
+</section>
+
+<!-- ㉓ 2030 目标进度 多仪表盘 -->
+<section class="card" style="margin-top:18px" id="c23">
+  <h2><span class="dot"></span>㉓ 2030 战略目标进度 · 多仪表盘</h2>
+  <div class="desc">以 2024 年实际值对照国家中长期目标：森林覆盖率（目标 ≥25%）、森林蓄积量（目标 200 亿 m³）、木材自给率（=100%−对外依存度，越高越安全）。三项均已达标或改善。</div>
+  <div id="targetGauge" class="chart" style="height:360px"></div>
+</section>
+
+<!-- ㉔ 指标相关性矩阵 热力图 -->
+<section class="card" style="margin-top:18px" id="c24">
+  <h2><span class="dot"></span>㉔ 核心指标相关性矩阵（Pearson · 2015–2024）</h2>
+  <div class="desc">对产值、木材产量、森林蓄积量、森林覆盖率、造林面积五项指标按十年样本计算两两 Pearson 相关系数。越接近 1（红）同向越强，越接近 −1（蓝）反向越强，用于发现"增绿—增收"的协同关系。</div>
+  <div id="corrChart" class="chart" style="height:460px"></div>
+</section>
+
+<!-- ㉕ 三次产业产值演变 堆叠柱 -->
+<section class="card" style="margin-top:18px" id="c25">
+  <h2><span class="dot"></span>㉕ 林业三次产业产值演变 · 堆叠柱（2017 / 2019 / 2023）</h2>
+  <div class="desc">对比三个代表性年份的一、二、三产业产值构成（2023 为基于占比趋势的估算）。可观察第三产业比重上升、产业结构持续优化。堆叠柱突出总量与内部结构同步变化。</div>
+  <div id="threeIndChart" class="chart" style="height:420px"></div>
+</section>
+
+<!-- ㉖ 省级覆盖率 棒棒糖排序图 -->
+<section class="card" style="margin-top:18px" id="c26">
+  <h2><span class="dot"></span>㉖ 各省森林覆盖率 · 棒棒糖排序图（降序）</h2>
+  <div class="desc">将 34 个省级行政区按森林覆盖率从高到低排序，用"茎+点"棒棒糖呈现，圆点按所属七大区域渐变着色。比普通柱状更清爽，一眼看清"南高北低、西北垫底"的空间格局。</div>
+  <div id="lolliChart" class="chart" style="height:560px"></div>
 </section>
 
 <section class="grid row2" style="margin-top:18px" id="tables">
@@ -781,6 +817,116 @@ const idxChart = echarts.init(document.getElementById('indexChart'), null, {rend
   });
 })();
 
+/* ---------- ㉒ 累计造林面积 阶梯面积图 ---------- */
+const cumAffChart = echarts.init(document.getElementById('cumAffChart'), null, {renderer:'canvas'});
+(function(){
+  const arr = F.afforestation;
+  let s=0; const cum = arr.map(v=>(s+=v));
+  const total = cum[cum.length-1];
+  cumAffChart.setOption({
+    tooltip:{trigger:'axis',formatter:p=>`${p[0].axisValue} 年<br/>当年造林：${p[0].data[1]} 万公顷<br/>累计：${p[0].data[2]} 万公顷`},
+    grid:{left:60,right:30,top:30,bottom:40},
+    xAxis:{type:'category',data:F.years,boundaryGap:false,axisLabel:{color:C.sub},axisLine:{lineStyle:{color:'rgba(120,160,220,.3)'}}},
+    yAxis:{type:'value',name:'累计造林(万公顷)',nameTextStyle:{color:C.sub},axisLabel:{color:C.sub},splitLine:{lineStyle:{color:'rgba(120,160,220,.12)'}}},
+    series:[{
+      type:'line',step:'end',symbol:'circle',symbolSize:6,
+      lineStyle:{width:3,color:C.green},itemStyle:{color:C.green},
+      areaStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(46,230,160,.45)'},{offset:1,color:'rgba(46,230,160,.03)'}])},
+      data: cum.map((v,i)=>[i, arr[i], v]),
+      markPoint:{symbolSize:0,label:{show:true,formatter:'十年累计 '+total.toFixed(0)+' 万公顷',color:C.gold,fontWeight:'bold',position:'top'},data:[{coord:[F.years.length-1, total]}]},
+    }],
+  });
+})();
+
+/* ---------- ㉓ 2030 目标进度 多仪表盘 ---------- */
+const targetGauge = echarts.init(document.getElementById('targetGauge'), null, {renderer:'canvas'});
+(function(){
+  const gauges = [
+    {name:'森林覆盖率(%)', value:25.09, target:25, max:30, unit:'%', color:C.green},
+    {name:'森林蓄积量(亿m³)', value:209.88, target:200, max:240, unit:'亿', color:C.cyan},
+    {name:'木材自给率(%)', value:100-31.38, target:65, max:100, unit:'%', color:C.gold},
+  ];
+  targetGauge.setOption({
+    tooltip:{formatter:p=>`${p.name}<br/>实际：${p.value}${p.data.unit}　目标：${p.data.target}${p.data.unit}`},
+    series: gauges.map((g,i)=>({
+      type:'gauge', center:[(i+0.5)/3*100+'%','58%'], radius:'78%',
+      min:0, max:g.max, splitNumber:5,
+      progress:{show:true,width:12,itemStyle:{color:g.color}},
+      axisLine:{lineStyle:{width:12,color:[[g.target/g.max,'rgba(120,160,220,.25)'],[1,'rgba(120,160,220,.12)']]}},
+      axisTick:{show:false}, splitLine:{length:10,lineStyle:{color:'rgba(120,160,220,.4)'}},
+      axisLabel:{color:C.sub,fontSize:9,distance:12},
+      pointer:{width:4,itemStyle:{color:g.color}},
+      anchor:{show:true,size:8,itemStyle:{color:g.color}},
+      title:{offsetCenter:[0,'72%'],color:C.sub,fontSize:12},
+      detail:{valueAnimation:true,offsetCenter:[0,'40%'],fontSize:20,fontWeight:'bold',color:'#fff',formatter:`{value}${g.unit}`},
+      data:[{value:+g.value.toFixed(2),name:g.name,unit:g.unit,target:g.target}],
+    })),
+  });
+})();
+
+/* ---------- ㉔ 指标相关性矩阵 热力图 ---------- */
+const corrChart = echarts.init(document.getElementById('corrChart'), null, {renderer:'canvas'});
+(function(){
+  const labels=['产值','木材产量','森林蓄积','森林覆盖率','造林面积'];
+  const seriesArr=[F.outputValue, F.timber, F.stockEst, F.coverageEst, F.afforestation];
+  const n=seriesArr.length;
+  const mean=a=>a.reduce((x,y)=>x+y,0)/a.length;
+  const pearson=(a,b)=>{const ma=mean(a),mb=mean(b);let num=0,da=0,db=0;for(let i=0;i<a.length;i++){num+=(a[i]-ma)*(b[i]-mb);da+=(a[i]-ma)**2;db+=(b[i]-mb)**2;}return num/Math.sqrt(da*db);};
+  const data=[];
+  for(let i=0;i<n;i++)for(let j=0;j<n;j++){data.push([j,i,+pearson(seriesArr[i],seriesArr[j]).toFixed(2)]);}
+  corrChart.setOption({
+    tooltip:{position:'top',formatter:p=>`${labels[p.data[1]]} × ${labels[p.data[0]]}<br/>r = ${p.data[2]}`},
+    grid:{left:90,right:30,top:30,bottom:70},
+    xAxis:{type:'category',data:labels,axisLabel:{color:C.sub,rotate:30},splitArea:{show:true}},
+    yAxis:{type:'category',data:labels,axisLabel:{color:C.sub},splitArea:{show:true}},
+    visualMap:{min:-1,max:1,calculable:true,orient:'horizontal',left:'center',bottom:10,
+      inRange:{color:['#2f7bff','#0f1b30','#ff5c8a']},textStyle:{color:C.sub}},
+    series:[{type:'heatmap',data,label:{show:true,color:'#fff',fontSize:12,formatter:p=>p.data[2]},
+      itemStyle:{borderColor:'#0a0e1a',borderWidth:1},emphasis:{itemStyle:{shadowBlur:8,shadowColor:'rgba(255,255,255,.4)'}}}],
+  });
+})();
+
+/* ---------- ㉕ 三次产业产值演变 堆叠柱 ---------- */
+const threeIndChart = echarts.init(document.getElementById('threeIndChart'), null, {renderer:'canvas'});
+(function(){
+  const yrs=[2017,2019,2023];
+  const t1=yrs.map(y=>F.threeIndustry[y]['第一产业']);
+  const t2=yrs.map(y=>F.threeIndustry[y]['第二产业']);
+  const t3=yrs.map(y=>F.threeIndustry[y]['第三产业']);
+  const mk=(name,data,color)=>({name,type:'bar',stack:'t',data,itemStyle:{color},barWidth:'46%',
+    emphasis:{focus:'series'},
+    label:{show:true,position:'inside',color:'#06121f',fontSize:10,formatter:p=>p.value}});
+  threeIndChart.setOption({
+    tooltip:{trigger:'axis',axisPointer:{type:'shadow'},valueFormatter:v=>v+' 亿元'},
+    legend:{top:2,textStyle:{color:C.sub},data:['第一产业','第二产业','第三产业']},
+    grid:{left:60,right:30,top:40,bottom:36},
+    xAxis:{type:'category',data:yrs.map(y=>y+' 年'),axisLabel:{color:C.sub},axisLine:{lineStyle:{color:'rgba(120,160,220,.3)'}}},
+    yAxis:{type:'value',name:'产值(亿元)',nameTextStyle:{color:C.sub},axisLabel:{color:C.sub},splitLine:{lineStyle:{color:'rgba(120,160,220,.12)'}}},
+    series:[mk('第一产业',t1,C.green),mk('第二产业',t2,C.cyan),mk('第三产业',t3,C.gold)],
+  });
+})();
+
+/* ---------- ㉖ 省级覆盖率 棒棒糖排序图 ---------- */
+const lolliChart = echarts.init(document.getElementById('lolliChart'), null, {renderer:'canvas'});
+(function(){
+  const entries=Object.entries(F.provinceCoverage).sort((a,b)=>b[1]-a[1]);
+  const names=entries.map(e=>e[0]);
+  const vals=entries.map(e=>e[1]);
+  const regionColor={'华北':'#19c37d','东北':'#2fd0c8','华东':'#36d3ff','华中':'#7c8cff','华南':'#ffd166','西南':'#ff9f6e','西北':'#ff7eb6','港澳台':'#b388ff'};
+  const colors=entries.map(e=>regionColor[F.regionMap[e[0]]]||'#888');
+  lolliChart.setOption({
+    tooltip:{trigger:'item',formatter:p=>{const r=F.regionMap[names[p.dataIndex]];return `${names[p.dataIndex]}（${r}）<br/>森林覆盖率：${vals[p.dataIndex]}%`;}},
+    grid:{left:130,right:40,top:20,bottom:30},
+    xAxis:{type:'value',name:'覆盖率(%)',nameTextStyle:{color:C.sub},axisLabel:{color:C.sub},splitLine:{lineStyle:{color:'rgba(120,160,220,.12)'}}},
+    yAxis:{type:'category',data:names,axisLabel:{color:C.sub,fontSize:11},axisLine:{lineStyle:{color:'rgba(120,160,220,.3)'}}},
+    series:[
+      {type:'bar',data:vals.map((v,i)=>({value:v,itemStyle:{color:colors[i]}})),barWidth:3,silent:true,z:1},
+      {type:'scatter',data:vals,symbolSize:12,itemStyle:{color:p=>colors[p.dataIndex],borderColor:'#0a0e1a',borderWidth:1.5},
+        label:{show:true,position:'right',color:C.sub,fontSize:10,formatter:p=>vals[p.dataIndex]+'%'},z:2},
+    ],
+  });
+})();
+
 /* ---------- 数据故事：滚动揭示 ---------- */
 const coEls=document.querySelectorAll('.callout');
 if('IntersectionObserver' in window){
@@ -815,7 +961,8 @@ document.getElementById('tblInd').innerHTML=buildTable(
 window.addEventListener('resize',()=>{[tl,mapChart,radar,gauge,sankey,river,area,
   timberChart,sunburstChart,treemapChart,heatmapChart,graphChart,
   picChart,boxChart,parChart,bubbleChart,funnelChart,
-  roseChart,treeChart,worldChart,idxChart].forEach(c=>c.resize());});
+  roseChart,treeChart,worldChart,idxChart,
+  cumAffChart,targetGauge,corrChart,threeIndChart,lolliChart].forEach(c=>c.resize());});
 </script>
 </body>
 </html>
