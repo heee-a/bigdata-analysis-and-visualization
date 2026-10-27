@@ -89,7 +89,7 @@
 <header>
   <div>
     <h1>中国林业资源大数据分析 · 2015–2024</h1>
-    <div class="sub">基于国家统计局、国家林业和草原局、中国林业信息网等权威公开数据，对近十年我国森林资源规模、木材生产、林业产业与造林结构进行交互式可视化。共 20 类高级图表 + 数据总表，拖动时间轴可联动仪表盘与年份快照，并附自包含动画演示。</div>
+    <div class="sub">基于国家统计局、国家林业和草原局、中国林业信息网等权威公开数据，对近十年我国森林资源规模、木材生产、林业产业与造林结构进行交互式可视化。共 21 类高级图表 + 数据总表，拖动时间轴可联动仪表盘与年份快照，并附自包含动画演示。</div>
   </div>
   <div class="badge" id="upd">数据更新：2026-10-27</div>
 </header>
@@ -104,6 +104,7 @@
   <a href="#c13">⑬象形柱</a><a href="#c14">⑭箱线</a><a href="#c15">⑮平行</a>
   <a href="#c16">⑯气泡</a><a href="#c17">⑰漏斗</a>
   <a href="#c18">⑱玫瑰</a><a href="#c19">⑲树图</a><a href="#c20">⑳世界对比</a>
+  <a href="#c21">㉑综合指数</a>
   <a href="#story">数据故事</a><a href="#tables">数据总表</a>
 </nav>
 
@@ -254,6 +255,12 @@
 </section>
 
 <!-- 数据总表 -->
+<section class="card" style="margin-top:18px" id="c21">
+  <h2><span class="dot"></span>㉑ 林业发展综合指数（2015 = 100）</h2>
+  <div class="desc">将产值、木材产量、森林蓄积量、森林覆盖率四项核心指标以 2015 年为基准（=100）归一化，观察“增绿”与“增收”的同步跃升。四条曲线整体向上，说明生态与产业十年协同走强。</div>
+  <div id="indexChart" class="chart" style="height:440px"></div>
+</section>
+
 <section class="grid row2" style="margin-top:18px" id="tables">
   <div class="tbl-card"><h2><span class="dot"></span>年度核心指标总表<span class="tag">单位见列名</span></h2><div id="tblCore"></div></div>
   <div class="tbl-card"><h2><span class="dot"></span>木材供需与对外依存度</h2><div id="tblTimber"></div></div>
@@ -743,6 +750,37 @@ worldChart.setOption({
     label:{show:true,formatter:p=>p.data.name,position:'top',color:C.sub,fontSize:11}}]
 });
 
+/* ---------- ㉑ 综合指数（2015=100） ---------- */
+const idxChart = echarts.init(document.getElementById('indexChart'), null, {renderer:'canvas'});
+(function(){
+  const base = {
+    output: F.outputValue[0],
+    timber: F.timber[0],
+    stock:  F.stockEst[0],
+    cover:  F.coverageEst[0],
+  };
+  const norm = (arr,b)=>arr.map(v=>+((v/b)*100).toFixed(1));
+  const seriesDefs = [
+    {name:'林业产值指数', data:norm(F.outputValue,base.output), color:C.green},
+    {name:'木材产量指数', data:norm(F.timber,base.timber),   color:C.cyan},
+    {name:'森林蓄积指数', data:norm(F.stockEst,base.stock),   color:C.gold},
+    {name:'森林覆盖率指数', data:norm(F.coverageEst,base.cover), color:C.pink},
+  ];
+  idxChart.setOption({
+    tooltip:{trigger:'axis',valueFormatter:v=>v},
+    legend:{top:2,textStyle:{color:C.sub},data:seriesDefs.map(s=>s.name)},
+    grid:{left:50,right:30,top:42,bottom:40},
+    xAxis:{type:'category',data:years,boundaryGap:false,axisLabel:{color:C.sub},axisLine:{lineStyle:{color:'rgba(120,160,220,.3)'}}},
+    yAxis:{type:'value',name:'指数(2015=100)',nameTextStyle:{color:C.sub},axisLabel:{color:C.sub},splitLine:{lineStyle:{color:'rgba(120,160,220,.12)'}}},
+    series:seriesDefs.map(s=>({
+      name:s.name,type:'line',data:s.data,smooth:true,symbol:'circle',symbolSize:6,
+      lineStyle:{width:3,color:s.color},itemStyle:{color:s.color},
+      areaStyle:{},emphasis:{focus:'series'},
+      markLine:{silent:true,symbol:'none',lineStyle:{color:'rgba(255,255,255,.25)',type:'dashed'},data:[{yAxis:100,label:{formatter:'基准 100',color:C.sub}}]},
+    })),
+  });
+})();
+
 /* ---------- 数据故事：滚动揭示 ---------- */
 const coEls=document.querySelectorAll('.callout');
 if('IntersectionObserver' in window){
@@ -777,7 +815,7 @@ document.getElementById('tblInd').innerHTML=buildTable(
 window.addEventListener('resize',()=>{[tl,mapChart,radar,gauge,sankey,river,area,
   timberChart,sunburstChart,treemapChart,heatmapChart,graphChart,
   picChart,boxChart,parChart,bubbleChart,funnelChart,
-  roseChart,treeChart,worldChart].forEach(c=>c.resize());});
+  roseChart,treeChart,worldChart,idxChart].forEach(c=>c.resize());});
 </script>
 </body>
 </html>
