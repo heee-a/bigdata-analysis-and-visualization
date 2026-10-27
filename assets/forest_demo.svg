@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 540" font-family="Segoe UI, PingFang SC, Microsoft YaHei, sans-serif">
+  <defs>
+    <linearGradient id="gO" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="rgba(46,230,160,.45)"/><stop offset="1" stop-color="rgba(46,230,160,0)"/>
+    </linearGradient>
+    <linearGradient id="gT" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="rgba(255,159,90,.35)"/><stop offset="1" stop-color="rgba(255,159,90,0)"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1000" height="540" fill="#0a0e1a"/>
+  <text x="40" y="44" fill="#2ee6a0" font-size="24" font-weight="800">中国林业资源 · 十年增长动画演示</text>
+  <text x="40" y="66" fill="#9fb0cc" font-size="13">2015 → 2024  林业产业总产值(绿) 与 木材产量(橙) 逐年绘制（循环播放）</text>
+
+  <line x1="110" y1="420.0" x2="892" y2="420.0" stroke="rgba(120,160,220,.12)" stroke-width="1"/><text x="102" y="424.0" fill="#9fb0cc" font-size="11" text-anchor="end">55k</text><line x1="110" y1="352.0" x2="892" y2="352.0" stroke="rgba(120,160,220,.12)" stroke-width="1"/><text x="102" y="356.0" fill="#9fb0cc" font-size="11" text-anchor="end">65k</text><line x1="110" y1="284.0" x2="892" y2="284.0" stroke="rgba(120,160,220,.12)" stroke-width="1"/><text x="102" y="288.0" fill="#9fb0cc" font-size="11" text-anchor="end">75k</text><line x1="110" y1="216.0" x2="892" y2="216.0" stroke="rgba(120,160,220,.12)" stroke-width="1"/><text x="102" y="220.0" fill="#9fb0cc" font-size="11" text-anchor="end">85k</text><line x1="110" y1="148.0" x2="892" y2="148.0" stroke="rgba(120,160,220,.12)" stroke-width="1"/><text x="102" y="152.0" fill="#9fb0cc" font-size="11" text-anchor="end">95k</text><line x1="110" y1="80.0" x2="892" y2="80.0" stroke="rgba(120,160,220,.12)" stroke-width="1"/><text x="102" y="84.0" fill="#9fb0cc" font-size="11" text-anchor="end">105k</text><text x="900" y="424.0" fill="#ff9f5a" font-size="11" text-anchor="start">6k</text><text x="900" y="349.0" fill="#ff9f5a" font-size="11" text-anchor="start">8k</text><text x="900" y="274.0" fill="#ff9f5a" font-size="11" text-anchor="start">10k</text><text x="900" y="199.0" fill="#ff9f5a" font-size="11" text-anchor="start">12k</text><text x="900" y="124.0" fill="#ff9f5a" font-size="11" text-anchor="start">14k</text>
+  <line x1="110" y1="80" x2="110" y2="420" stroke="rgba(120,160,220,.3)"/>
+  <line x1="110" y1="420" x2="892" y2="420" stroke="rgba(120,160,220,.3)"/>
+  <line x1="892" y1="80" x2="892" y2="420" stroke="rgba(120,160,220,.3)"/>
+  <text x="110.0" y="442.0" fill="#9fb0cc" font-size="11" text-anchor="middle">2015</text><text x="196.9" y="442.0" fill="#9fb0cc" font-size="11" text-anchor="middle">2016</text><text x="283.8" y="442.0" fill="#9fb0cc" font-size="11" text-anchor="middle">2017</text><text x="370.7" y="442.0" fill="#9fb0cc" font-size="11" text-anchor="middle">2018</text><text x="457.6" y="442.0" fill="#9fb0cc" font-size="11" text-anchor="middle">2019</text><text x="544.4" y="442.0" fill="#9fb0cc" font-size="11" text-anchor="middle">2020</text><text x="631.3" y="442.0" fill="#9fb0cc" font-size="11" text-anchor="middle">2021</text><text x="718.2" y="442.0" fill="#9fb0cc" font-size="11" text-anchor="middle">2022</text><text x="805.1" y="442.0" fill="#9fb0cc" font-size="11" text-anchor="middle">2023</text><text x="892.0" y="442.0" fill="#9fb0cc" font-size="11" text-anchor="middle">2024</text>
+  <text x="70" y="66" fill="#2ee6a0" font-size="12">产值(亿元)</text>
+  <text x="902" y="66" fill="#ff9f5a" font-size="12">木材(万m³)</text>
+
+  <!-- 背景完整线（淡） -->
+  <path d="M 110.0 390.3 L 196.9 352.8 L 283.8 309.4 L 370.7 275.3 L 457.6 244.9 L 544.4 242.0 L 631.3 204.0 L 718.2 177.1 L 805.1 163.0 L 892.0 102.4" fill="none" stroke="rgba(46,230,160,.18)" stroke-width="2"/>
+  <path d="M 110.0 388.8 L 196.9 394.4 L 283.8 356.9 L 370.7 328.8 L 457.6 306.4 L 544.4 317.7 L 631.3 274.2 L 718.2 244.0 L 805.1 197.1 L 892.0 129.8" fill="none" stroke="rgba(255,159,90,.18)" stroke-width="2"/>
+
+  <!-- 面积填充（动画裁剪） -->
+  <clipPath id="clipO"><rect x="110" y="80" width="0" height="340">
+     <animate attributeName="width" from="0" to="782" dur="8.0s" repeatCount="indefinite"/></rect></clipPath>
+  <path d="M 110.0 390.3 L 196.9 352.8 L 283.8 309.4 L 370.7 275.3 L 457.6 244.9 L 544.4 242.0 L 631.3 204.0 L 718.2 177.1 L 805.1 163.0 L 892.0 102.4 L 892 420 L 110 420 Z" fill="url(#gO)" clip-path="url(#clipO)"/>
+
+  <!-- 动画绘制线 -->
+  <path d="M 110.0 390.3 L 196.9 352.8 L 283.8 309.4 L 370.7 275.3 L 457.6 244.9 L 544.4 242.0 L 631.3 204.0 L 718.2 177.1 L 805.1 163.0 L 892.0 102.4" fill="none" stroke="#2ee6a0" stroke-width="3.5" pathLength="1000"
+        stroke-dasharray="1000" stroke-dashoffset="1000" filter="url(#glow)">
+    <animate attributeName="stroke-dashoffset" from="1000" to="0" dur="8.0s" repeatCount="indefinite"/>
+  </path>
+  <path d="M 110.0 388.8 L 196.9 394.4 L 283.8 356.9 L 370.7 328.8 L 457.6 306.4 L 544.4 317.7 L 631.3 274.2 L 718.2 244.0 L 805.1 197.1 L 892.0 129.8" fill="none" stroke="#ff9f5a" stroke-width="3.5" pathLength="1000"
+        stroke-dasharray="1000" stroke-dashoffset="1000" filter="url(#glow)">
+    <animate attributeName="stroke-dashoffset" from="1000" to="0" dur="8.0s" repeatCount="indefinite"/>
+  </path>
+
+  <!-- 行进标记点 -->
+  <circle r="6" fill="#2ee6a0" filter="url(#glow)"><animateMotion dur="8.0s" repeatCount="indefinite" path="M 110.0 390.3 L 196.9 352.8 L 283.8 309.4 L 370.7 275.3 L 457.6 244.9 L 544.4 242.0 L 631.3 204.0 L 718.2 177.1 L 805.1 163.0 L 892.0 102.4"/></circle>
+  <circle r="6" fill="#ff9f5a" filter="url(#glow)"><animateMotion dur="8.0s" repeatCount="indefinite" path="M 110.0 388.8 L 196.9 394.4 L 283.8 356.9 L 370.7 328.8 L 457.6 306.4 L 544.4 317.7 L 631.3 274.2 L 718.2 244.0 L 805.1 197.1 L 892.0 129.8"/></circle>
+
+  <circle cx="110.0" cy="390.3" r="4" fill="#2ee6a0"><animate attributeName="opacity" from="0" to="1" begin="0.40s" dur="0.3s" fill="freeze"/><animate attributeName="r" values="3;6;4" begin="0.40s" dur="0.5s" fill="freeze"/></circle><circle cx="196.9" cy="352.8" r="4" fill="#2ee6a0"><animate attributeName="opacity" from="0" to="1" begin="1.18s" dur="0.3s" fill="freeze"/><animate attributeName="r" values="3;6;4" begin="1.18s" dur="0.5s" fill="freeze"/></circle><circle cx="283.8" cy="309.4" r="4" fill="#2ee6a0"><animate attributeName="opacity" from="0" to="1" begin="1.96s" dur="0.3s" fill="freeze"/><animate attributeName="r" values="3;6;4" begin="1.96s" dur="0.5s" fill="freeze"/></circle><circle cx="370.7" cy="275.3" r="4" fill="#2ee6a0"><animate attributeName="opacity" from="0" to="1" begin="2.74s" dur="0.3s" fill="freeze"/><animate attributeName="r" values="3;6;4" begin="2.74s" dur="0.5s" fill="freeze"/></circle><circle cx="457.6" cy="244.9" r="4" fill="#2ee6a0"><animate attributeName="opacity" from="0" to="1" begin="3.52s" dur="0.3s" fill="freeze"/><animate attributeName="r" values="3;6;4" begin="3.52s" dur="0.5s" fill="freeze"/></circle><circle cx="544.4" cy="242.0" r="4" fill="#2ee6a0"><animate attributeName="opacity" from="0" to="1" begin="4.30s" dur="0.3s" fill="freeze"/><animate attributeName="r" values="3;6;4" begin="4.30s" dur="0.5s" fill="freeze"/></circle><circle cx="631.3" cy="204.0" r="4" fill="#2ee6a0"><animate attributeName="opacity" from="0" to="1" begin="5.08s" dur="0.3s" fill="freeze"/><animate attributeName="r" values="3;6;4" begin="5.08s" dur="0.5s" fill="freeze"/></circle><circle cx="718.2" cy="177.1" r="4" fill="#2ee6a0"><animate attributeName="opacity" from="0" to="1" begin="5.86s" dur="0.3s" fill="freeze"/><animate attributeName="r" values="3;6;4" begin="5.86s" dur="0.5s" fill="freeze"/></circle><circle cx="805.1" cy="163.0" r="4" fill="#2ee6a0"><animate attributeName="opacity" from="0" to="1" begin="6.64s" dur="0.3s" fill="freeze"/><animate attributeName="r" values="3;6;4" begin="6.64s" dur="0.5s" fill="freeze"/></circle><circle cx="892.0" cy="102.4" r="4" fill="#2ee6a0"><animate attributeName="opacity" from="0" to="1" begin="7.42s" dur="0.3s" fill="freeze"/><animate attributeName="r" values="3;6;4" begin="7.42s" dur="0.5s" fill="freeze"/></circle>
+  <circle cx="110.0" cy="388.8" r="4" fill="#ff9f5a"><animate attributeName="opacity" from="0" to="1" begin="0.40s" dur="0.3s" fill="freeze"/><animate attributeName="r" values="3;6;4" begin="0.40s" dur="0.5s" fill="freeze"/></circle><circle cx="196.9" cy="394.4" r="4" fill="#ff9f5a"><animate attributeName="opacity" from="0" to="1" begin="1.18s" dur="0.3s" fill="freeze"/><animate attributeName="r" values="3;6;4" begin="1.18s" dur="0.5s" fill="freeze"/></circle><circle cx="283.8" cy="356.9" r="4" fill="#ff9f5a"><animate attributeName="opacity" from="0" to="1" begin="1.96s" dur="0.3s" fill="freeze"/><animate attributeName="r" values="3;6;4" begin="1.96s" dur="0.5s" fill="freeze"/></circle><circle cx="370.7" cy="328.8" r="4" fill="#ff9f5a"><animate attributeName="opacity" from="0" to="1" begin="2.74s" dur="0.3s" fill="freeze"/><animate attributeName="r" values="3;6;4" begin="2.74s" dur="0.5s" fill="freeze"/></circle><circle cx="457.6" cy="306.4" r="4" fill="#ff9f5a"><animate attributeName="opacity" from="0" to="1" begin="3.52s" dur="0.3s" fill="freeze"/><animate attributeName="r" values="3;6;4" begin="3.52s" dur="0.5s" fill="freeze"/></circle><circle cx="544.4" cy="317.7" r="4" fill="#ff9f5a"><animate attributeName="opacity" from="0" to="1" begin="4.30s" dur="0.3s" fill="freeze"/><animate attributeName="r" values="3;6;4" begin="4.30s" dur="0.5s" fill="freeze"/></circle><circle cx="631.3" cy="274.2" r="4" fill="#ff9f5a"><animate attributeName="opacity" from="0" to="1" begin="5.08s" dur="0.3s" fill="freeze"/><animate attributeName="r" values="3;6;4" begin="5.08s" dur="0.5s" fill="freeze"/></circle><circle cx="718.2" cy="244.0" r="4" fill="#ff9f5a"><animate attributeName="opacity" from="0" to="1" begin="5.86s" dur="0.3s" fill="freeze"/><animate attributeName="r" values="3;6;4" begin="5.86s" dur="0.5s" fill="freeze"/></circle><circle cx="805.1" cy="197.1" r="4" fill="#ff9f5a"><animate attributeName="opacity" from="0" to="1" begin="6.64s" dur="0.3s" fill="freeze"/><animate attributeName="r" values="3;6;4" begin="6.64s" dur="0.5s" fill="freeze"/></circle><circle cx="892.0" cy="129.8" r="4" fill="#ff9f5a"><animate attributeName="opacity" from="0" to="1" begin="7.42s" dur="0.3s" fill="freeze"/><animate attributeName="r" values="3;6;4" begin="7.42s" dur="0.5s" fill="freeze"/></circle>
+
+  <!-- 图例 + 结论 -->
+  <rect x="40" y="470" width="14" height="14" rx="3" fill="#2ee6a0"/><text x="62" y="482" fill="#e8eefb" font-size="13">林业产业总产值（亿元）</text>
+  <rect x="300" y="470" width="14" height="14" rx="3" fill="#ff9f5a"/><text x="322" y="482" fill="#e8eefb" font-size="13">木材产量（万 m³）</text>
+  <text x="40" y="512" fill="#9fb0cc" font-size="13">十年间林业产值由 5.94 万亿增至 10.17 万亿（+71%），木材产量由 6832 万 m³ 增至 13740 万 m³（+101%）。</text>
+  <text x="40" y="532" fill="#ffd166" font-size="12">数据来源：国家统计局 / 国家林草局 / 中国林业信息网（详见仓库 README）。</text>
+</svg>
