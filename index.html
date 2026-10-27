@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>中国林业资源大数据分析 · 2015–2024</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+  :root{
+    --bg:#0a0e1a; --bg2:#0f1626; --card:rgba(20,30,50,0.72);
+    --line:rgba(120,160,220,0.16); --txt:#e8eefb; --sub:#9fb0cc;
+    --green:#2ee6a0; --green2:#19c37d; --cyan:#36d3ff; --gold:#ffd166;
+    --purple:#a78bfa; --pink:#ff7eb6; --orange:#ff9f5a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    background:radial-gradient(1200px 700px at 15% -10%,#13233f 0%,transparent 55%),
+               radial-gradient(1000px 600px at 110% 10%,#0c2e2a 0%,transparent 50%),
+               var(--bg);
+    color:var(--txt); min-height:100vh; padding:28px clamp(14px,4vw,56px) 60px;
+  }
+  header{display:flex;flex-wrap:wrap;align-items:flex-end;gap:18px;justify-content:space-between;margin-bottom:14px}
+  h1{font-size:clamp(22px,3.4vw,38px);font-weight:800;letter-spacing:1px;
+     background:linear-gradient(90deg,var(--green),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:var(--sub);font-size:14px;margin-top:6px;max-width:760px;line-height:1.6}
+  .badge{font-size:12px;color:var(--cyan);border:1px solid var(--line);border-radius:20px;padding:6px 14px;background:rgba(54,211,255,.06)}
+  .grid{display:grid;gap:18px}
+  .kpis{grid-template-columns:repeat(auto-fit,minmax(180px,1fr));margin-bottom:8px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px;position:relative;overflow:hidden}
+  .kpi::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(46,230,160,.10),transparent 60%);pointer-events:none}
+  .kpi .v{font-size:clamp(22px,2.6vw,32px);font-weight:800;line-height:1.1}
+  .kpi .l{color:var(--sub);font-size:13px;margin-top:6px}
+  .kpi .t{font-size:11px;color:var(--gold);margin-top:8px;opacity:.9}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 20px 8px;backdrop-filter:blur(6px)}
+  .card h2{font-size:16px;font-weight:700;margin-bottom:2px;display:flex;align-items:center;gap:9px}
+  .card h2 .dot{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 12px var(--green)}
+  .card .desc{color:var(--sub);font-size:12.5px;margin:4px 0 6px;line-height:1.55}
+  .chart{width:100%;height:430px}
+  .row2{grid-template-columns:repeat(auto-fit,minmax(440px,1fr))}
+  .rowMap{grid-template-columns:1.5fr 1fr}
+  @media(max-width:900px){.rowMap{grid-template-columns:1fr}.chart{height:360px}}
+  footer{margin-top:26px;color:var(--sub);font-size:12.5px;line-height:1.8;border-top:1px solid var(--line);padding-top:16px}
+  footer b{color:var(--txt)}
+  .note{color:var(--gold);font-size:12px;margin:6px 2px 10px;line-height:1.6}
+  .pill{display:inline-block;font-size:11px;padding:2px 9px;border-radius:10px;background:rgba(167,139,250,.14);color:var(--purple);margin-right:6px}
+  .loading{color:var(--sub);font-size:13px;padding:30px;text-align:center}
+  .controls{display:flex;gap:10px;align-items:center;margin:4px 0 10px}
+  .btn{cursor:pointer;border:1px solid var(--line);background:rgba(54,211,255,.08);color:var(--cyan);
+       border-radius:10px;padding:7px 16px;font-size:13px;transition:.2s}
+  .btn:hover{background:rgba(54,211,255,.18)}
+  a{color:var(--cyan)}
+  /* 目录导航 */
+  .toc{position:sticky;top:0;z-index:30;display:flex;flex-wrap:wrap;gap:7px;margin:0 0 18px;padding:11px 13px;
+       background:rgba(10,14,26,.86);backdrop-filter:blur(9px);border:1px solid var(--line);border-radius:14px}
+  .toc a{font-size:12px;color:var(--sub);text-decoration:none;padding:4px 10px;border-radius:9px;border:1px solid transparent;transition:.2s}
+  .toc a:hover{color:var(--cyan);border-color:var(--line);background:rgba(54,211,255,.07)}
+  /* 数据表格 */
+  .tbl-card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 20px}
+  .tbl-card h2{font-size:16px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:9px}
+  .tbl-card h2 .dot{width:9px;height:9px;border-radius:50%;background:var(--cyan);box-shadow:0 0 12px var(--cyan)}
+  .tbl-wrap{overflow-x:auto}
+  table.data{border-collapse:collapse;width:100%;font-size:13px;min-width:480px}
+  table.data th,table.data td{border:1px solid var(--line);padding:8px 10px;text-align:right;white-space:nowrap}
+  table.data th{background:rgba(54,211,255,.08);color:var(--cyan);position:sticky;top:0}
+  table.data td:first-child,table.data th:first-child{text-align:left;color:var(--txt);font-weight:600}
+  table.data tr:nth-child(even) td{background:rgba(120,160,220,.04)}
+  table.data tbody tr:hover td{background:rgba(46,230,160,.08)}
+  .tag{display:inline-block;font-size:11px;padding:1px 7px;border-radius:8px;background:rgba(46,230,160,.12);color:var(--green);margin-left:6px}
+  /* 年份快照面板（联动时间轴） */
+  .snap{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:6px 0 12px}
+  .snap .si{background:rgba(54,211,255,.06);border:1px solid var(--line);border-radius:12px;padding:12px 14px;text-align:center}
+  .snap .sv{font-size:clamp(18px,2.2vw,26px);font-weight:800;color:var(--cyan);display:block;line-height:1.15}
+  .snap .sl{font-size:11.5px;color:var(--sub);margin-top:5px;display:block}
+  /* 数据故事 */
+  .story{max-width:1000px;margin:30px auto 0}
+  .story h2{font-size:clamp(18px,2.4vw,24px);font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:9px}
+  .story h2 .dot{width:10px;height:10px;border-radius:50%;background:var(--gold);box-shadow:0 0 12px var(--gold)}
+  .story .lead{color:var(--sub);line-height:1.85;font-size:14px;margin:8px 0 18px}
+  .callouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+  .callout{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;opacity:0;transform:translateY(20px);transition:.6s ease}
+  .callout.show{opacity:1;transform:none}
+  .callout .big{font-size:clamp(22px,2.6vw,30px);font-weight:800;color:var(--green);line-height:1.1}
+  .callout .t{color:var(--sub);font-size:13px;margin-top:8px;line-height:1.6}
+  .callout .bar{height:4px;border-radius:3px;background:linear-gradient(90deg,var(--green),var(--cyan));margin-top:12px;opacity:.85}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>中国林业资源大数据分析 · 2015–2024</h1>
+    <div class="sub">基于国家统计局、国家林业和草原局、中国林业信息网等权威公开数据，对近十年我国森林资源规模、木材生产、林业产业与造林结构进行交互式可视化。共 20 类高级图表 + 数据总表，拖动时间轴可联动仪表盘与年份快照，并附自包含动画演示。</div>
+  </div>
+  <div class="badge" id="upd">数据更新：2026-10-27</div>
+</header>
+
+<!-- 目录导航 -->
+<nav class="toc">
+  <a href="#kpis">KPI</a>
+  <a href="#c1">①时间轴</a><a href="#c2">②地图</a><a href="#c3">③雷达</a>
+  <a href="#c4">④仪表盘</a><a href="#c5">⑤桑基</a><a href="#c6">⑥河流</a>
+  <a href="#c7">⑦双轴</a><a href="#c8">⑧依存度</a><a href="#c9">⑨旭日</a>
+  <a href="#c10">⑩矩形树</a><a href="#c11">⑪热力</a><a href="#c12">⑫关系</a>
+  <a href="#c13">⑬象形柱</a><a href="#c14">⑭箱线</a><a href="#c15">⑮平行</a>
+  <a href="#c16">⑯气泡</a><a href="#c17">⑰漏斗</a>
+  <a href="#c18">⑱玫瑰</a><a href="#c19">⑲树图</a><a href="#c20">⑳世界对比</a>
+  <a href="#story">数据故事</a><a href="#tables">数据总表</a>
+</nav>
+
+<!-- KPI 卡片 -->
+<section class="grid kpis" id="kpis"></section>
+
+<!-- ① 时间轴动画 -->
+<section class="card" style="margin-top:18px" id="c1">
+  <h2><span class="dot"></span>① 时间轴动画 · 林业产业总产值 & 木材产量逐年增长</h2>
+  <div class="desc">下方为<b>动态时间序列</b>（非静态条形/饼图）：点击“▶ 播放”可观看 2015→2024 数据逐年绘制的动画；也可拖动时间轴手动浏览。</div>
+  <div class="controls">
+    <span class="btn" id="playBtn">▶ 播放</span>
+    <span class="btn" id="resetBtn">↺ 重置</span>
+    <span style="color:var(--sub);font-size:12px" id="yearLabel">当前年份：2015</span>
+    <span style="color:var(--gold);font-size:12px;margin-left:auto">拖动下方时间轴 → 上方仪表盘与年份快照同步变化</span>
+  </div>
+  <div class="snap" id="snap"></div>
+  <div id="timelineChart" class="chart" style="height:460px"></div>
+</section>
+
+<!-- ② 地图 + ③ 雷达 -->
+<section class="grid rowMap" style="margin-top:18px">
+  <div class="card" id="c2">
+    <h2><span class="dot"></span>② 中国省级森林覆盖率地图（第九次森林资源清查）</h2>
+    <div class="desc"> Choropleth 分级填色地图，直观呈现“南方高、西北低”的森林资源空间格局；TOP5 省份以涟漪高亮。</div>
+    <div id="mapChart" class="chart" style="height:520px"><div class="loading" id="mapLoad">地图加载中（需联网获取中国地理边界）…</div></div>
+  </div>
+  <div class="card" id="c3">
+    <h2><span class="dot"></span>③ 多维雷达对比 · 2018 ↔ 2024</h2>
+    <div class="desc">将覆盖率、蓄积量、森林面积等异量纲指标归一化，对比第九次清查期末与 2024 年水平。</div>
+    <div id="radarChart" class="chart" style="height:520px"></div>
+  </div>
+</section>
+
+<!-- ④ 仪表盘 + ⑤ 桑基 -->
+<section class="grid row2" style="margin-top:18px">
+  <div class="card" id="c4">
+    <h2><span class="dot"></span>④ 森林覆盖率仪表盘 · 现状与目标</h2>
+    <div class="desc">2024 年森林覆盖率 25.09%，已超过“2030 年国家自主贡献”阶段性目标，提前达标。</div>
+    <div id="gaugeChart" class="chart" style="height:420px"></div>
+  </div>
+  <div class="card" id="c5">
+    <h2><span class="dot"></span>⑤ 林地结构桑基图（第九次清查）</h2>
+    <div class="desc">桑基（能量/流量）图展示全国 3.24 亿公顷林地的地类构成流向。</div>
+    <div id="sankeyChart" class="chart" style="height:420px"></div>
+  </div>
+</section>
+
+<!-- ⑥ 主题河流 + ⑦ 面积折线 -->
+<section class="grid row2" style="margin-top:18px">
+  <div class="card" id="c6">
+    <h2><span class="dot"></span>⑥ 造林方式构成 · 主题河流图（2015–2019）</h2>
+    <div class="desc">ThemeRiver 以“河流”宽度表示各造林方式面积随时间的变化，直观展示造林结构的演变。</div>
+    <div id="riverChart" class="chart" style="height:420px"></div>
+  </div>
+  <div class="card" id="c7">
+    <h2><span class="dot"></span>⑦ 木材产量 & 林业产值 · 双轴渐变面积</h2>
+    <div class="desc">渐变面积 + 平滑曲线，双 Y 轴呈现两种“量”的增长轨迹。</div>
+    <div class="note" id="affNote"></div>
+    <div id="areaChart" class="chart" style="height:420px"></div>
+  </div>
+</section>
+
+<!-- ⑧ 木材供需与对外依存度 -->
+<section class="card" style="margin-top:18px" id="c8">
+  <h2><span class="dot"></span>⑧ 木材供需与对外依存度 · 进口量 & 依存度（2015–2024）</h2>
+  <div class="desc">新增“其他相关内容”：木材对外依存度由 2017 年峰值 54.71% 降至 2024 年 31.38%，国内供给能力显著增强（数据：观研天下 2010–2024）。</div>
+  <div id="timberChart" class="chart" style="height:420px"></div>
+</section>
+
+<!-- ⑨ 旭日图 + ⑩ 矩形树图 -->
+<section class="grid row2" style="margin-top:18px">
+  <div class="card" id="c9">
+    <h2><span class="dot"></span>⑨ 林业产业构成 · 旭日图（2019）</h2>
+    <div class="desc">旭日图（Sunburst）展示三次产业及其支柱行业的层级占比，中心为林业产业总产值。</div>
+    <div id="sunburstChart" class="chart" style="height:430px"></div>
+  </div>
+  <div class="card" id="c10">
+    <h2><span class="dot"></span>⑩ 省级林业产业 TOP · 矩形树图（2018）</h2>
+    <div class="desc">矩形树图（Treemap）按产值面积映射，直观对比林业大省产业规模。</div>
+    <div id="treemapChart" class="chart" style="height:430px"></div>
+  </div>
+</section>
+
+<!-- ⑪ 热力图 + ⑫ 关系图 -->
+<section class="grid row2" style="margin-top:18px">
+  <div class="card" id="c11">
+    <h2><span class="dot"></span>⑪ 多维指标年际热力图（归一化）</h2>
+    <div class="desc">热力图将 5 个异量纲指标的逐年走势归一化，颜色越亮代表相对水平越高，便于观察协同增长。</div>
+    <div id="heatmapChart" class="chart" style="height:430px"></div>
+  </div>
+  <div class="card" id="c12">
+    <h2><span class="dot"></span>⑫ 林业生态系统关系图（知识图谱）</h2>
+    <div class="desc">力导向关系图串联“森林资源—生态效益—经济社会”三大维度的关键节点。</div>
+    <div id="graphChart" class="chart" style="height:430px"></div>
+  </div>
+</section>
+
+<!-- ⑬–⑯ 新增高级图表 -->
+<section class="grid row2" style="margin-top:18px">
+  <div class="card" id="c13">
+    <h2><span class="dot"></span>⑬ 七大区域森林覆盖率 · 象形柱图</h2>
+    <div class="desc">用“树木”符号高度表示各区域平均覆盖率，直观体现“南高北低”的空间格局。</div>
+    <div id="picChart" class="chart" style="height:430px"></div>
+  </div>
+  <div class="card" id="c14">
+    <h2><span class="dot"></span>⑭ 七大区域覆盖率分布 · 箱线图</h2>
+    <div class="desc">箱线图展示各区域内省份覆盖率的中位数、四分位与离散程度（统计分布视角）。</div>
+    <div id="boxChart" class="chart" style="height:430px"></div>
+  </div>
+  <div class="card" id="c15">
+    <h2><span class="dot"></span>⑮ 多维指标年际 · 平行坐标图</h2>
+    <div class="desc">平行坐标将 5 个归一化指标并排，观察各年份在多维空间中的整体跃升轨迹。</div>
+    <div id="parChart" class="chart" style="height:430px"></div>
+  </div>
+  <div class="card" id="c16">
+    <h2><span class="dot"></span>⑯ 省级覆盖率 vs 产业产值 · 气泡图</h2>
+    <div class="desc">横轴为森林覆盖率、纵轴为 2018 年林业产值，气泡大小映射产值规模，揭示资源与产业的空间错位。</div>
+    <div id="bubbleChart" class="chart" style="height:430px"></div>
+  </div>
+</section>
+
+<!-- ⑰ 漏斗图 -->
+<section class="card" style="margin-top:18px" id="c17">
+  <h2><span class="dot"></span>⑰ 林业产业构成 · 漏斗图（2019）</h2>
+  <div class="desc">漏斗图自上而下展示 2019 年林业产业总产值的产业层级集中度（总产值 → 二三一产）。</div>
+  <div id="funnelChart" class="chart" style="height:420px"></div>
+</section>
+
+<!-- ⑱–⑳ 进阶图表 -->
+<section class="grid row2" style="margin-top:18px">
+  <div class="card" id="c18">
+    <h2><span class="dot"></span>⑱ 省级林业产业 TOP10 · 南丁格尔玫瑰图</h2>
+    <div class="desc">玫瑰图（Nightingale Rose）以半径表征产值规模，比普通饼图更强调“量级差异”，呈现林业大省的梯队分布。</div>
+    <div id="roseChart" class="chart" style="height:430px"></div>
+  </div>
+  <div class="card" id="c19">
+    <h2><span class="dot"></span>⑲ 林业生态体系分类 · 树图（Tree）</h2>
+    <div class="desc">正交树图展示“森林资源—生态效益—经济社会”三大分支及其关键指标层级，与⑫关系图互为补充。</div>
+    <div id="treeChart" class="chart" style="height:430px"></div>
+  </div>
+</section>
+
+<section class="card" style="margin-top:18px" id="c20">
+  <h2><span class="dot"></span>⑳ 世界主要国家森林对比 · 面积–覆盖率气泡图</h2>
+  <div class="desc">气泡图横轴为森林面积、纵轴为覆盖率、大小映射面积，将中国置于全球坐标中观察其“面积大、覆盖率中等”的特征（数据：FAO FRA 2020）。</div>
+  <div id="worldChart" class="chart" style="height:440px"></div>
+</section>
+
+<!-- 数据总表 -->
+<section class="grid row2" style="margin-top:18px" id="tables">
+  <div class="tbl-card"><h2><span class="dot"></span>年度核心指标总表<span class="tag">单位见列名</span></h2><div id="tblCore"></div></div>
+  <div class="tbl-card"><h2><span class="dot"></span>木材供需与对外依存度</h2><div id="tblTimber"></div></div>
+  <div class="tbl-card"><h2><span class="dot"></span>省级森林覆盖率（降序）</h2><div id="tblProv"></div></div>
+  <div class="tbl-card"><h2><span class="dot"></span>林业三次产业产值</h2><div id="tblInd"></div></div>
+</section>
+
+<!-- 数据故事 -->
+<section class="story" id="story">
+  <h2><span class="dot"></span>十年增绿 · 数据故事</h2>
+  <div class="lead">从 2015 到 2024，中国森林资源规模、木材保障与林业产业同步跃升。下面四个关键叙事，均可在上方图表中找到对应数据支撑。</div>
+  <div class="callouts">
+    <div class="callout"><div class="big">25.09%</div><div class="t">森林覆盖率由 22.96%（2018）升至 25.09%（2024），提前 6 年达成 2030 年国家自主贡献目标。</div><div class="bar"></div></div>
+    <div class="callout"><div class="big">+39 亿 m³</div><div class="t">森林蓄积量增至 209.88 亿 m³，人工林面积约 8000 万公顷稳居世界第一。</div><div class="bar"></div></div>
+    <div class="callout"><div class="big">10.17 万亿</div><div class="t">林草产业年产值突破 10 万亿元，较 2015 年的 5.94 万亿增长约 71%。</div><div class="bar"></div></div>
+    <div class="callout"><div class="big">31.4%</div><div class="t">木材对外依存度由 2017 年峰值 54.7% 降至 2024 年 31.4%，国内供给保障显著增强。</div><div class="bar"></div></div>
+  </div>
+</section>
+
+<footer>
+  <div class="pill">数据来源</div>
+  <b>国家统计局</b>《中国统计年鉴》《国民经济和社会发展统计公报》 ·
+  <b>国家林草局</b>《中国国土绿化状况公报》《中国林业和草原发展统计公报》 ·
+  <b>中国林业信息网</b>(lknet.ac.cn) 林业产业总产值年度数据 ·
+  <b>《中国森林资源核算研究》</b>（第九次全国森林资源清查期末 2018） ·
+  国新办 2025-09-10 新闻发布会公布的 2024 年森林资源数据。
+  <br>世界对比数据来源：<b>FAO《全球森林资源评估 2020》(FRA 2020)</b>（森林面积为约数，单位百万公顷）。
+  <br><br>
+  <b>口径说明：</b>我国不发布“全国树木总棵数”指标，描述森林规模以<b>森林面积、森林蓄积量、森林覆盖率</b>为准。森林覆盖率/蓄积量/面积来自每 5 年一次的全国森林资源清查，图中“插值估算”年度值仅供趋势演示；造林面积 2021 年起统计口径调整，跨段数值不可直接比较。
+  <br><span style="opacity:.7">本页为自包含静态站点（ECharts CDN + 运行时加载中国地理边界），可离线打开（地图需联网）。</span>
+</footer>
+
+<script src="data.js"></script>
+<script>
+const F = window.FOREST;
+const C = {green:'#2ee6a0',cyan:'#36d3ff',gold:'#ffd166',purple:'#a78bfa',pink:'#ff7eb6',orange:'#ff9f5a',sub:'#9fb0cc'};
+// 通用工具栏：数据视图 + 保存图片
+const tb = {show:true,right:14,top:6,iconStyle:{borderColor:C.sub},
+  feature:{dataView:{show:true,readOnly:false,title:'数据',lang:['数据视图','关闭','刷新']},
+           saveAsImage:{show:true,title:'保存图片',backgroundColor:'#0a0e1a'}}};
+
+/* ---------- KPI 卡片 ---------- */
+const kpis = [
+  {v:25.09, l:'森林覆盖率 (%)', t:'2024 · 超 2030 目标', c:C.green, suf:'%'},
+  {v:209.88, l:'森林蓄积量 (亿 m³)', t:'2024 · 提前达标', c:C.cyan, suf:'', dec:2},
+  {v:2.41, l:'森林面积 (亿公顷)', t:'2024 估算', c:C.green2, suf:'', dec:2},
+  {v:8000, l:'人工林面积 (万公顷)', t:'世界第一', c:C.gold, suf:''},
+  {v:10.17, l:'林草产业年产值 (万亿)', t:'2024 突破 10 万亿', c:C.purple, suf:'', dec:2},
+  {v:5, l:'国家公园 (个)', t:'首批设立', c:C.pink, suf:''},
+  {v:31.38, l:'木材对外依存度 (%)', t:'2024 · 较2015降约20pct', c:C.orange, suf:'', dec:2},
+  {v:12, l:'森林年碳汇量 (亿吨)', t:'2023 达 12 亿吨以上', c:C.cyan, suf:'', dec:0},
+  {v:4000, l:'集体林业带动就业 (万人)', t:'每年', c:C.purple, suf:'', dec:0},
+  {v:39.12, l:'草原面积 (亿亩)', t:'2024 生态家底', c:C.gold, suf:'', dec:2},
+];
+const kpiBox = document.getElementById('kpis');
+kpis.forEach(k=>{
+  const el=document.createElement('div'); el.className='kpi';
+  el.innerHTML=`<div class="v" style="color:${k.c}" data-target="${k.v}" data-dec="${k.dec||0}" data-suf="${k.suf||''}">0</div><div class="l">${k.l}</div><div class="t">${k.t}</div>`;
+  kpiBox.appendChild(el);
+});
+function countUp(){
+  document.querySelectorAll('.kpi .v').forEach(el=>{
+    const target=+el.dataset.target, dec=+el.dataset.dec, suf=el.dataset.suf;
+    const dur=1400, t0=performance.now();
+    function step(t){
+      let p=Math.min(1,(t-t0)/dur); p=1-Math.pow(1-p,3);
+      const val=(target*p).toFixed(dec);
+      el.textContent=val+suf;
+      if(p<1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  });
+}
+countUp();
+
+/* ---------- ① 时间轴动画 ---------- */
+const tl = echarts.init(document.getElementById('timelineChart'),'dark');
+const years=F.years;
+const ov=()=>F.outputValue, tk=()=>F.timber;
+const tlOptions=[];
+years.forEach((y,i)=>{
+  tlOptions.push({
+    title:{text:`${y} 年`,left:'center',top:6,textStyle:{color:C.cyan,fontSize:22}},
+    tooltip:{trigger:'axis'},
+    legend:{data:['林业产业总产值(亿元)','木材产量(万m³)'],top:36,textStyle:{color:C.sub}},
+    grid:{left:60,right:60,top:80,bottom:60},
+    xAxis:{type:'category',data:years.slice(0,i+1),axisLabel:{color:C.sub}},
+    yAxis:[
+      {type:'value',name:'产值(亿元)',axisLabel:{color:C.sub},splitLine:{lineStyle:{color:'rgba(120,160,220,.12)'}}},
+      {type:'value',name:'木材(万m³)',axisLabel:{color:C.sub},splitLine:{show:false}}
+    ],
+    series:[
+      {name:'林业产业总产值(亿元)',type:'line',smooth:true,data:ov().slice(0,i+1),
+       lineStyle:{width:4,color:C.green},itemStyle:{color:C.green},
+       areaStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(46,230,160,.45)'},{offset:1,color:'rgba(46,230,160,0)'}])},
+       symbolSize:9, animationDuration:900},
+      {name:'木材产量(万m³)',type:'line',yAxisIndex:1,smooth:true,data:tk().slice(0,i+1),
+       lineStyle:{width:4,color:C.orange},itemStyle:{color:C.orange},
+       areaStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(255,159,90,.35)'},{offset:1,color:'rgba(255,159,90,0)'}])},
+       symbolSize:9, animationDuration:900}
+    ]
+  });
+});
+tl.setOption({
+  baseOption:{timeline:{axisType:'category',data:years,autoPlay:true,playInterval:1100,
+    currentIndex:0,left:30,right:30,bottom:10,lineStyle:{color:'rgba(120,160,220,.3)'},
+    label:{color:C.sub},checkpointStyle:{color:C.green,borderColor:'#fff'},
+    controlStyle:{color:C.cyan,borderColor:C.cyan}}},
+  options:tlOptions
+});
+document.getElementById('yearLabel').textContent='当前年份：'+years[tl.getCurrentOption().baseOption.timeline.currentIndex];
+tl.on('timelinechanged',e=>{applyYear(e.currentIndex);});
+const playBtn=document.getElementById('playBtn'), resetBtn=document.getElementById('resetBtn');
+playBtn.onclick=()=>{ const o=tl.getCurrentOption().baseOption.timeline; if(o.autoPlay){tl.setOption({baseOption:{timeline:{autoPlay:false}}});playBtn.textContent='▶ 播放';} else {tl.setOption({baseOption:{timeline:{autoPlay:true}}});playBtn.textContent='⏸ 暂停';} };
+resetBtn.onclick=()=>{tl.setOption({baseOption:{timeline:{currentIndex:0,autoPlay:false}}});playBtn.textContent='▶ 播放';applyYear(0);};
+
+/* ---------- ② 中国省级地图 ---------- */
+const mapChart=echarts.init(document.getElementById('mapChart'),'dark');
+function renderMap(geo){
+  echarts.registerMap('china',geo);
+  const loadEl=document.getElementById('mapLoad'); if(loadEl) loadEl.remove();
+  const data=Object.entries(F.provinceCoverage).map(([n,v])=>({name:n,value:v}));
+  const coord={};
+  (geo.features||[]).forEach(f=>{ if(f.properties&&f.properties.name&&f.properties.center) coord[f.properties.name]=f.properties.center; });
+  const top5=Object.entries(F.provinceCoverage).sort((a,b)=>b[1]-a[1]).slice(0,5)
+     .map(([n,v])=>({name:n,value:(coord[n]||[0,0]).concat(v)}));
+  mapChart.setOption({
+    tooltip:{trigger:'item',formatter:p=> p.seriesType==='effectScatter'
+        ? `${p.name}<br/>森林覆盖率：<b>${p.value[2]}%</b>　全国 TOP5`
+        : `${p.name}<br/>森林覆盖率：<b>${p.value??'—'}%</b>`},
+    visualMap:{min:4,max:68,left:14,bottom:20,text:['高','低'],calculable:true,
+      inRange:{color:['#0b3d2e','#19c37d','#ffd166','#ff7eb6']},textStyle:{color:C.sub}},
+    series:[
+      {type:'map',map:'china',roam:true,data,
+        label:{show:false},emphasis:{label:{show:true,color:'#fff'},itemStyle:{areaColor:C.cyan}},
+        itemStyle:{borderColor:'rgba(120,160,220,.25)',areaColor:'#10203a'}},
+      {type:'effectScatter',coordinateSystem:'geo',data:top5,zlevel:2,
+        symbolSize:13,rippleEffect:{brushType:'stroke',scale:3.2},
+        itemStyle:{color:C.pink,shadowBlur:10,shadowColor:C.pink}}
+    ]
+  });
+}
+fetch('https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json')
+  .then(r=>r.json()).then(renderMap)
+  .catch(()=>{document.getElementById('mapLoad').textContent='⚠ 地图边界加载失败（需联网）。请联网后刷新，其余图表不受影响。';});
+
+/* ---------- ③ 雷达 ---------- */
+const radar=echarts.init(document.getElementById('radarChart'),'dark');
+const rmax={覆盖率:30,蓄积量:220,面积:26000,人工林:9000,生态价值:20};
+const rval=(o)=>[o.覆盖率,o.蓄积量,o.面积/10000,o.人工林/1000,o.生态价值];
+radar.setOption({
+  toolbox:tb,
+  tooltip:{},legend:{data:['2018（第九次清查）','2024'],top:0,textStyle:{color:C.sub}},
+  radar:{indicator:[
+    {name:'森林覆盖率(%)',max:rmax.覆盖率},{name:'森林蓄积量(十亿m³)',max:rmax.蓄积量},
+    {name:'森林面积(千万公顷)',max:rmax.面积},{name:'人工林(千万公顷)',max:rmax.人工林},
+    {name:'生态服务价值(万亿)',max:rmax.生态价值}],
+    axisName:{color:C.sub},splitLine:{lineStyle:{color:'rgba(120,160,220,.18)'}},
+    splitArea:{areaStyle:{color:['rgba(46,230,160,.04)','rgba(54,211,255,.04)']}},
+    axisLine:{lineStyle:{color:'rgba(120,160,220,.25)'}}},
+  series:[{type:'radar',data:[
+    {value:rval({覆盖率:22.96,蓄积量:170.58,面积:21822,人工林:8000,生态价值:15.88}),name:'2018（第九次清查）',
+     areaStyle:{color:'rgba(167,139,250,.30)'},lineStyle:{color:C.purple},itemStyle:{color:C.purple}},
+    {value:rval({覆盖率:25.09,蓄积量:209.88,面积:24086,人工林:8000,生态价值:18.5}),name:'2024',
+     areaStyle:{color:'rgba(46,230,160,.35)'},lineStyle:{color:C.green},itemStyle:{color:C.green}}
+  ]}]
+});
+
+/* ---------- ④ 仪表盘 ---------- */
+const gauge=echarts.init(document.getElementById('gaugeChart'),'dark');
+gauge.setOption({
+  toolbox:tb,
+  series:[{type:'gauge',min:0,max:30,splitNumber:6,radius:'92%',center:['50%','58%'],
+    axisLine:{lineStyle:{width:22,color:[[0.77,C.green2],[0.867,C.cyan],[1,'#ff7eb6']]}},
+    pointer:{itemStyle:{color:C.cyan}},axisTick:{distance:-22,lineStyle:{color:'#fff'}},
+    splitLine:{distance:-22,length:22,lineStyle:{color:'#fff'}},
+    axisLabel:{distance:-2,color:C.sub,fontSize:11},
+    detail:{valueAnimation:true,formatter:'{value}%',color:C.green,fontSize:42,offsetCenter:[0,'38%']},
+    title:{offsetCenter:[0,'72%'],color:C.sub,fontSize:13},
+    data:[{value:25.09,name:'森林覆盖率（2024）'}],
+    markLine:{}}]
+});
+
+/* ---------- 年份快照（联动时间轴） ---------- */
+const snapDefs=[
+  {k:'ov',  l:'林业产值(亿元)',  dec:0, arr:F.outputValue},
+  {k:'tk',  l:'木材产量(万m³)',  dec:0, arr:F.timber},
+  {k:'cov', l:'覆盖率(估,%)',    dec:2, arr:F.coverageEst},
+  {k:'stk', l:'蓄积量(估,亿m³)', dec:2, arr:F.stockEst},
+  {k:'area',l:'森林面积(估,万ha)',dec:0, arr:F.areaEst},
+  {k:'aff', l:'造林面积(万ha)',  dec:1, arr:F.afforestation},
+];
+const snapBox=document.getElementById('snap');
+snapDefs.forEach(d=>{
+  const el=document.createElement('div'); el.className='si';
+  el.innerHTML=`<span class="sv" id="snap_${d.k}">–</span><span class="sl">${d.l}</span>`;
+  snapBox.appendChild(el);
+});
+function applyYear(i){
+  const y=years[i];
+  document.getElementById('yearLabel').textContent='当前年份：'+y;
+  snapDefs.forEach(d=>{ document.getElementById('snap_'+d.k).textContent=d.arr[i].toFixed(d.dec); });
+  // 仪表盘同步到该年（插值估算）覆盖率
+  gauge.setOption({series:[{data:[{value:+F.coverageEst[i], name:y+' 年森林覆盖率(估)'}]}]});
+}
+applyYear(tl.getCurrentOption().baseOption.timeline.currentIndex);
+
+/* ---------- ⑤ 桑基图 ---------- */
+const sankey=echarts.init(document.getElementById('sankeyChart'),'dark');
+const ls=F.landStructure; const skNodes=[{name:'全国林地'}], skLinks=[];
+Object.entries(ls).forEach(([k,v])=>{skNodes.push({name:k});skLinks.push({source:'全国林地',target:k,value:+v.toFixed(0)});});
+sankey.setOption({
+  toolbox:tb,
+  tooltip:{trigger:'item',formatter:p=>p.dataType==='edge'?`${p.data.source} → ${p.data.target}<br/>${p.data.value} 万公顷`:`${p.name}`},
+  series:[{type:'sankey',data:skNodes,links:skLinks,emphasis:{focus:'adjacency'},
+    nodeWidth:16,nodeGap:14,left:10,right:120,top:20,bottom:20,
+    lineStyle:{color:'gradient',opacity:.45,curveness:.5},
+    label:{color:C.sub,fontSize:12},
+    itemStyle:{color:C.green,borderColor:C.cyan}}]
+});
+
+/* ---------- ⑥ 主题河流图 ---------- */
+const river=echarts.init(document.getElementById('riverChart'),'dark');
+const rc=F.afforestationCompositionCats, ry=F.afforestationCompositionYears, rv=F.afforestationComposition;
+const riverData=[];
+ry.forEach((y,iy)=>rc.forEach((c,ic)=>riverData.push([String(y),rv[iy][ic],c])));
+river.setOption({
+  toolbox:tb,
+  tooltip:{trigger:'axis',axisPointer:{type:'line',lineStyle:{color:C.sub}}},
+  legend:{data:rc,top:0,textStyle:{color:C.sub}},
+  singleAxis:{type:'category',data:ry.map(String),top:46,bottom:30,axisLabel:{color:C.sub},
+    axisLine:{lineStyle:{color:'rgba(120,160,220,.3)'}},axisTick:{lineStyle:{color:'rgba(120,160,220,.3)'}}},
+  series:[{type:'themeRiver',data:riverData,label:{show:false},
+    color:[C.green,C.cyan,C.gold,C.purple,C.orange],emphasis:{itemStyle:{shadowBlur:14,shadowColor:C.cyan}}}]
+});
+
+/* ---------- ⑦ 双轴渐变面积 ---------- */
+const area=echarts.init(document.getElementById('areaChart'),'dark');
+document.getElementById('affNote').textContent=F.afforestationCaption;
+area.setOption({
+  toolbox:tb,
+  tooltip:{trigger:'axis'},legend:{data:['林业产业总产值(亿元)','木材产量(万m³)'],top:0,textStyle:{color:C.sub}},
+  grid:{left:60,right:60,top:40,bottom:40},
+  xAxis:{type:'category',data:years,axisLabel:{color:C.sub},boundaryGap:false},
+  yAxis:[{type:'value',name:'产值(亿元)',axisLabel:{color:C.sub},splitLine:{lineStyle:{color:'rgba(120,160,220,.12)'}}},
+         {type:'value',name:'木材(万m³)',axisLabel:{color:C.sub},splitLine:{show:false}}],
+  dataZoom:[{type:'inside'},{type:'slider',height:16,bottom:8,textStyle:{color:C.sub}}],
+  series:[
+    {name:'林业产业总产值(亿元)',type:'line',smooth:true,data:F.outputValue,
+     lineStyle:{width:3,color:C.green},itemStyle:{color:C.green},symbolSize:7,
+     areaStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(46,230,160,.4)'},{offset:1,color:'rgba(46,230,160,0)'}])}},
+    {name:'木材产量(万m³)',type:'line',yAxisIndex:1,smooth:true,data:F.timber,
+     lineStyle:{width:3,color:C.orange},itemStyle:{color:C.orange},symbolSize:7,
+     areaStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(255,159,90,.35)'},{offset:1,color:'rgba(255,159,90,0)'}])}}
+  ]
+});
+
+/* ---------- ⑧ 木材供需与对外依存度 ---------- */
+const timberChart=echarts.init(document.getElementById('timberChart'),'dark');
+timberChart.setOption({
+  toolbox:tb,
+  tooltip:{trigger:'axis',axisPointer:{type:'shadow'}},
+  legend:{data:['木材产量','进口量','对外依存度(%)'],top:0,textStyle:{color:C.sub}},
+  grid:{left:60,right:60,top:40,bottom:40},
+  xAxis:{type:'category',data:F.timberTradeYears,axisLabel:{color:C.sub}},
+  yAxis:[{type:'value',name:'万 m³',axisLabel:{color:C.sub},splitLine:{lineStyle:{color:'rgba(120,160,220,.12)'}}},
+         {type:'value',name:'依存度 %',max:60,axisLabel:{color:C.sub},splitLine:{show:false}}],
+  dataZoom:[{type:'inside'},{type:'slider',height:16,bottom:8,textStyle:{color:C.sub}}],
+  series:[
+    {name:'木材产量',type:'bar',data:F.timber,itemStyle:{color:C.green,borderRadius:[3,3,0,0]}},
+    {name:'进口量',type:'bar',data:F.timberImport,itemStyle:{color:C.cyan,borderRadius:[3,3,0,0]}},
+    {name:'对外依存度(%)',type:'line',yAxisIndex:1,data:F.timberDependency,smooth:true,
+     lineStyle:{color:C.orange,width:3},itemStyle:{color:C.orange},symbolSize:7,
+     areaStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(255,159,90,.3)'},{offset:1,color:'rgba(255,159,90,0)'}])}}
+  ]
+});
+
+/* ---------- ⑨ 旭日图 ---------- */
+const sunburstChart=echarts.init(document.getElementById('sunburstChart'),'dark');
+sunburstChart.setOption({
+  toolbox:tb,
+  tooltip:{},
+  series:[{type:'sunburst',data:[F.industrySunburst],radius:[0,'92%'],
+    label:{color:'#0a0e1a',fontSize:11,minAngle:8},
+    itemStyle:{borderColor:'#0a0e1a',borderWidth:2},
+    levels:[{},{r0:'0%',r:'40%'},{r0:'40%',r:'92%'}],
+    color:[C.green,C.cyan,C.gold]}]
+});
+
+/* ---------- ⑩ 矩形树图 ---------- */
+const treemapChart=echarts.init(document.getElementById('treemapChart'),'dark');
+treemapChart.setOption({
+  toolbox:tb,
+  tooltip:{formatter:p=>`${p.name}<br/>林业产业总产值：<b>${p.value}</b> 亿元`},
+  series:[{type:'treemap',data:F.provinceIndustry,roam:false,breadcrumb:{show:false},
+    label:{color:'#0a0e1a',fontSize:13,fontWeight:'bold'},upperLabel:{show:false},
+    color:[C.green,C.cyan,C.gold,C.purple,C.orange,C.pink,'#36d3ff','#2ee6a0','#ffd166'],
+    levels:[{itemStyle:{borderColor:'#0a0e1a',borderWidth:3,gapWidth:3}}]}]
+});
+
+/* ---------- ⑪ 热力图 ---------- */
+const heatmapChart=echarts.init(document.getElementById('heatmapChart'),'dark');
+const hInds=[{n:'林业产值',a:F.outputValue},{n:'木材产量',a:F.timber},
+  {n:'森林覆盖率(估)',a:F.coverageEst},{n:'森林蓄积量(估)',a:F.stockEst},{n:'森林面积(估)',a:F.areaEst}];
+const hData=[];
+hInds.forEach((it,yi)=>{ const mx=Math.max(...it.a),mn=Math.min(...it.a);
+  it.a.forEach((v,xi)=>{ hData.push([xi,yi,+(((v-mn)/(mx-mn||1))*100).toFixed(1)]); }); });
+heatmapChart.setOption({
+  toolbox:tb,
+  tooltip:{position:'top',formatter:p=>`${hInds[p.value[1]].n} · ${F.years[p.value[0]]}：相对值 ${p.value[2]}`},
+  grid:{left:92,right:20,top:20,bottom:54},
+  xAxis:{type:'category',data:F.years,axisLabel:{color:C.sub},splitArea:{show:true}},
+  yAxis:{type:'category',data:hInds.map(d=>d.n),axisLabel:{color:C.sub},splitArea:{show:true}},
+  visualMap:{min:0,max:100,calculable:true,orient:'horizontal',left:'center',bottom:6,
+    inRange:{color:['#0b1f3a','#19c37d','#ffd166','#ff7eb6']},textStyle:{color:C.sub}},
+  series:[{type:'heatmap',data:hData,label:{show:true,color:'#0a0e1a',fontSize:10},
+    emphasis:{itemStyle:{shadowBlur:8,shadowColor:C.cyan}}}]
+});
+
+/* ---------- ⑫ 关系图 ---------- */
+const graphChart=echarts.init(document.getElementById('graphChart'),'dark');
+const gNodes=[
+  {name:'森林资源',symbolSize:64,category:0,itemStyle:{color:C.green},label:{fontSize:14,color:'#0a0e1a'}},
+  {name:'人工林面积\n世界第一',symbolSize:40,category:0,itemStyle:{color:C.green2}},
+  {name:'国家公园\n5 个',symbolSize:36,category:0,itemStyle:{color:C.green2}},
+  {name:'森林年碳汇\n12 亿吨',symbolSize:46,category:1,itemStyle:{color:C.cyan}},
+  {name:'生态服务价值\n15.88 万亿',symbolSize:46,category:1,itemStyle:{color:C.cyan}},
+  {name:'林草产业\n10.17 万亿',symbolSize:50,category:2,itemStyle:{color:C.gold}},
+  {name:'森林旅游\n39 亿人次',symbolSize:44,category:2,itemStyle:{color:C.orange}},
+  {name:'带动就业\n4000 万农民',symbolSize:44,category:2,itemStyle:{color:C.purple}},
+  {name:'木材供给\n1.37 亿 m³',symbolSize:42,category:2,itemStyle:{color:C.pink}},
+];
+const gLinks=[
+  {source:'森林资源',target:'人工林面积\n世界第一'},{source:'森林资源',target:'国家公园\n5 个'},
+  {source:'森林资源',target:'森林年碳汇\n12 亿吨'},{source:'森林资源',target:'生态服务价值\n15.88 万亿'},
+  {source:'森林资源',target:'林草产业\n10.17 万亿'},{source:'森林资源',target:'木材供给\n1.37 亿 m³'},
+  {source:'林草产业\n10.17 万亿',target:'森林旅游\n39 亿人次'},
+  {source:'林草产业\n10.17 万亿',target:'带动就业\n4000 万农民'},
+  {source:'生态服务价值\n15.88 万亿',target:'森林年碳汇\n12 亿吨'},
+];
+graphChart.setOption({
+  toolbox:tb,
+  tooltip:{},legend:{show:false},
+  series:[{type:'graph',layout:'force',roam:true,draggable:true,
+    categories:[{name:'资源本底'},{name:'生态效益'},{name:'经济社会'}],
+    data:gNodes,links:gLinks,
+    label:{show:true,color:'#e8eefb',fontSize:11,lineHeight:15},
+    lineStyle:{color:'rgba(120,160,220,.4)',curveness:0.15,width:1.5},
+    force:{repulsion:380,edgeLength:[60,160],gravity:0.12},
+    emphasis:{focus:'adjacency',lineStyle:{width:3,color:C.cyan}}}]
+});
+
+/* ---------- ⑬ 象形柱图（区域覆盖率） ---------- */
+const regions=['华北','东北','华东','华中','华南','西南','西北','港澳台'];
+const regionGroups=regions.map(r=>({r,vals:Object.entries(F.provinceCoverage).filter(([p])=>F.regionMap[p]===r).map(([,v])=>v)}));
+const regionMean=regionGroups.map(g=>+(g.vals.reduce((a,b)=>a+b,0)/g.vals.length).toFixed(2));
+const treePath='path://M50 4 L40 22 L45 22 L35 40 L42 40 L30 58 L70 58 L58 40 L65 40 L55 22 L60 22 Z';
+const picChart=echarts.init(document.getElementById('picChart'),'dark');
+picChart.setOption({
+  toolbox:tb,
+  tooltip:{trigger:'axis',formatter:p=>`${p[0].name} 区域<br/>平均森林覆盖率：<b>${p[0].value}%</b><br/>样本省区：${regionGroups.find(g=>g.r===p[0].name).vals.length} 个`},
+  grid:{left:50,right:24,top:24,bottom:36},
+  xAxis:{type:'category',data:regions,axisLabel:{color:C.sub,interval:0,fontSize:11}},
+  yAxis:{type:'value',name:'覆盖率 %',max:60,axisLabel:{color:C.sub},splitLine:{lineStyle:{color:'rgba(120,160,220,.12)'}}},
+  series:[{type:'pictorialBar',symbol:treePath,symbolSize:[34,'100%'],symbolPosition:'start',
+    data:regionMean,
+    itemStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:C.green},{offset:1,color:C.green2}])},
+    label:{show:true,position:'top',color:C.sub,formatter:p=>p.value+'%'}}]
+});
+
+/* ---------- ⑭ 箱线图（区域分布） ---------- */
+function quantile(sorted,q){const pos=(sorted.length-1)*q,base=Math.floor(pos),rest=pos-base;
+  return sorted[base+1]!==undefined?sorted[base]+rest*(sorted[base+1]-sorted[base]):sorted[base];}
+const boxData=regionGroups.map(g=>{const s=[...g.vals].sort((a,b)=>a-b);
+  return [s[0],+quantile(s,0.25).toFixed(2),+quantile(s,0.5).toFixed(2),+quantile(s,0.75).toFixed(2),s[s.length-1]];});
+const boxChart=echarts.init(document.getElementById('boxChart'),'dark');
+boxChart.setOption({
+  toolbox:tb,
+  tooltip:{trigger:'item'},
+  grid:{left:50,right:24,top:24,bottom:36},
+  xAxis:{type:'category',data:regions,axisLabel:{color:C.sub,interval:0,fontSize:11}},
+  yAxis:{type:'value',name:'覆盖率 %',axisLabel:{color:C.sub},splitLine:{lineStyle:{color:'rgba(120,160,220,.12)'}}},
+  series:[{type:'boxplot',data:boxData,
+    itemStyle:{color:'rgba(54,211,255,.18)',borderColor:C.cyan},
+    emphasis:{itemStyle:{borderColor:C.green}}}]
+});
+
+/* ---------- ⑮ 平行坐标图（年际多维） ---------- */
+const pMetrics=[{n:'产值',a:F.outputValue},{n:'木材',a:F.timber},{n:'覆盖率',a:F.coverageEst},{n:'蓄积量',a:F.stockEst},{n:'面积',a:F.areaEst}];
+const pNorm=pMetrics.map(m=>{const mx=Math.max(...m.a),mn=Math.min(...m.a);
+  return {n:m.n,a:m.a.map(v=>+(((v-mn)/(mx-mn||1))*100).toFixed(1))};});
+const parData=years.map((y,i)=>pNorm.map(m=>m.a[i]));
+const parChart=echarts.init(document.getElementById('parChart'),'dark');
+parChart.setOption({
+  toolbox:tb,
+  tooltip:{trigger:'item',formatter:p=>{const v=p.value;return `${years[p.dataIndex]} 年<br/>`+pNorm.map((m,i)=>m.n+'：'+v[i]).join('<br/>');}},
+  parallelAxis:pNorm.map(m=>({dim:0,name:m.n,min:0,max:100,axisLabel:{color:C.sub},nameTextStyle:{color:C.sub}})),
+  parallel:{left:46,right:46,top:40,bottom:24,parallelAxisDefault:{}},
+  series:[{type:'parallel',lineStyle:{width:2,opacity:.65},
+    data:parData,emphasis:{lineStyle:{width:4,opacity:1}}}]
+});
+
+/* ---------- ⑯ 气泡图（覆盖率 vs 产值） ---------- */
+const shortMap=F.provinceIndustryShort;
+const bubble=F.provinceIndustry.map(p=>({name:p.name,coverage:F.provinceCoverage[shortMap[p.name]],industry:p.value}));
+const bubbleChart=echarts.init(document.getElementById('bubbleChart'),'dark');
+bubbleChart.setOption({
+  toolbox:tb,
+  tooltip:{formatter:p=>`${p.data.name}<br/>森林覆盖率：<b>${p.data.coverage}%</b><br/>林业产业产值：<b>${p.data.industry}</b> 亿元`},
+  grid:{left:54,right:30,top:24,bottom:46},
+  xAxis:{type:'value',name:'森林覆盖率 %',min:0,max:70,axisLabel:{color:C.sub},splitLine:{lineStyle:{color:'rgba(120,160,220,.12)'}}},
+  yAxis:{type:'value',name:'林业产值(亿元)',axisLabel:{color:C.sub},splitLine:{lineStyle:{color:'rgba(120,160,220,.12)'}}},
+  series:[{type:'scatter',data:bubble,symbolSize:d=>Math.sqrt(d.industry)/2.0+12,
+    itemStyle:{color:new echarts.graphic.RadialGradient(0.4,0.3,1,[{offset:0,color:'rgba(54,211,255,.95)'},{offset:1,color:'rgba(167,139,250,.45)'}]),borderColor:C.cyan,borderWidth:1},
+    label:{show:true,formatter:p=>p.data.name,position:'top',color:C.sub,fontSize:11}}]
+});
+
+/* ---------- ⑰ 漏斗图（产业构成 2019） ---------- */
+const funnelChart=echarts.init(document.getElementById('funnelChart'),'dark');
+const fv=F.threeIndustry[2019];
+funnelChart.setOption({
+  toolbox:tb,
+  tooltip:{trigger:'item',formatter:p=>`${p.name}：<b>${p.value}</b> 亿元`},
+  series:[{type:'funnel',top:20,bottom:24,left:'8%',width:'84%',
+    min:0,max:80751,minSize:'22%',maxSize:'100%',sort:'descending',gap:3,
+    label:{show:true,position:'inside',color:'#0a0e1a',fontSize:12,formatter:p=>`${p.name} ${p.value}`},
+    itemStyle:{borderColor:'#0a0e1a',borderWidth:2},
+    color:[C.green,C.cyan,C.gold,C.purple],
+    data:[
+      {value:80751,name:'林业产业总产值'},
+      {value:fv['第二产业'],name:'第二产业'},
+      {value:fv['第一产业'],name:'第一产业'},
+      {value:fv['第三产业'],name:'第三产业'},
+    ]}]
+});
+
+/* ---------- ⑱ 南丁格尔玫瑰图（省级产业 TOP10） ---------- */
+const roseChart=echarts.init(document.getElementById('roseChart'),'dark');
+const roseData=F.provinceIndustry.map(p=>({name:p.name,value:p.value}));
+roseChart.setOption({
+  toolbox:tb,
+  tooltip:{trigger:'item',formatter:p=>`${p.name}<br/>林业产业产值：<b>${p.value}</b> 亿元（占比 ${p.percent}%）`},
+  legend:{show:false},
+  series:[{type:'pie',roseType:'area',radius:['16%','82%'],center:['50%','54%'],
+    itemStyle:{borderRadius:7,borderColor:'#0a0e1a',borderWidth:2},
+    label:{color:C.sub,fontSize:11,formatter:'{b}'},labelLine:{lineStyle:{color:C.sub}},
+    color:[C.green,C.cyan,C.gold,C.purple,C.orange,C.pink,'#7be0ff','#9affc0','#ffe08a','#d9b3ff'],
+    data:roseData}]
+});
+
+/* ---------- ⑲ 树图（林业生态体系分类） ---------- */
+const treeChart=echarts.init(document.getElementById('treeChart'),'dark');
+const treeData=[{name:'中国林业生态体系',children:[
+  {name:'森林资源',children:[
+    {name:'森林覆盖率 25.09%'},{name:'森林蓄积量 209.88亿m³'},
+    {name:'森林面积 2.41亿ha'},{name:'人工林 8000万ha（世界第一）'}]},
+  {name:'生态效益',children:[
+    {name:'年碳汇 12亿吨'},{name:'生态服务价值 15.88万亿'},
+    {name:'森林旅游 39亿人次'},{name:'自然保护地 1.18万个'}]},
+  {name:'经济社会',children:[
+    {name:'林草产业 10.17万亿'},{name:'带动就业 4000万人'},
+    {name:'木材供给 1.37亿m³'},{name:'对外依存度 31.4%'}]}
+]}];
+treeChart.setOption({
+  toolbox:tb,tooltip:{trigger:'item'},
+  series:[{type:'tree',data:treeData,top:'3%',left:'14%',bottom:'3%',right:'22%',
+    symbolSize:11,initialTreeDepth:2,roam:true,
+    label:{position:'left',color:C.sub,fontSize:11,verticalAlign:'middle'},
+    leaves:{label:{position:'right',color:C.sub,fontSize:11}},
+    lineStyle:{color:'rgba(120,160,220,.4)',curveness:0.5,width:1.4},
+    itemStyle:{color:C.green,borderColor:C.cyan},
+    emphasis:{focus:'descendant',itemStyle:{color:C.cyan}}}]
+});
+
+/* ---------- ⑳ 世界森林对比气泡图 ---------- */
+const worldChart=echarts.init(document.getElementById('worldChart'),'dark');
+const worldData=F.worldForest.map(d=>({name:d.name,value:[d.area,d.coverage,d.area]}));
+worldChart.setOption({
+  toolbox:tb,
+  tooltip:{formatter:p=>`${p.data.name}<br/>森林面积：<b>${p.data.value[0]}</b> 百万公顷<br/>覆盖率：<b>${p.data.value[1]}%</b>`},
+  grid:{left:56,right:34,top:30,bottom:50},
+  xAxis:{type:'value',name:'森林面积(百万ha)',nameLocation:'middle',nameGap:30,axisLabel:{color:C.sub},splitLine:{lineStyle:{color:'rgba(120,160,220,.12)'}}},
+  yAxis:{type:'value',name:'覆盖率(%)',axisLabel:{color:C.sub},splitLine:{lineStyle:{color:'rgba(120,160,220,.12)'}}},
+  series:[{type:'scatter',data:worldData,
+    symbolSize:v=>Math.sqrt(v[2])*4.2+10,
+    itemStyle:{color:p=>p.data.name==='中国'?C.green:'rgba(54,211,255,.72)',borderColor:p=>p.data.name==='中国'?C.gold:C.cyan,borderWidth:1.5},
+    label:{show:true,formatter:p=>p.data.name,position:'top',color:C.sub,fontSize:11}}]
+});
+
+/* ---------- 数据故事：滚动揭示 ---------- */
+const coEls=document.querySelectorAll('.callout');
+if('IntersectionObserver' in window){
+  const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('show');});},{threshold:.25});
+  coEls.forEach(el=>io.observe(el));
+}else{coEls.forEach(el=>el.classList.add('show'));}
+
+/* ---------- 数据总表 ---------- */
+function buildTable(headers,rows){
+  const h='<tr>'+headers.map(x=>`<th>${x}</th>`).join('')+'</tr>';
+  const b=rows.map(r=>'<tr>'+r.map(c=>`<td>${c}</td>`).join('')+'</tr>').join('');
+  return `<div class="tbl-wrap"><table class="data"><thead>${h}</thead><tbody>${b}</tbody></table></div>`;
+}
+// 年度核心指标
+const coreRows=years.map((y,i)=>[y,F.outputValue[i],F.timber[i],F.afforestation[i],F.coverageEst[i],F.stockEst[i],F.areaEst[i]]);
+document.getElementById('tblCore').innerHTML=buildTable(
+  ['年份','林业产值(亿元)','木材产量(万m³)','造林面积(万ha)','覆盖率(估,%)','蓄积量(估,亿m³)','森林面积(估,万ha)'],coreRows);
+// 木材供需
+const timberRows=F.timberTradeYears.map((y,i)=>[y,F.timber[i],F.timberImport[i],F.timberDemand[i],F.timberDependency[i]+'%']);
+document.getElementById('tblTimber').innerHTML=buildTable(
+  ['年份','木材产量(万m³)','进口量(万m³)','需求量(万m³)','对外依存度'],timberRows);
+// 省级覆盖率（降序）
+const provRows=Object.entries(F.provinceCoverage).sort((a,b)=>b[1]-a[1]).map(([n,v])=>[n,v+'%']);
+document.getElementById('tblProv').innerHTML=buildTable(['省级行政区','森林覆盖率'],provRows);
+// 三次产业
+const indYears=[2017,2019,2023];
+const indRows=indYears.map(y=>{const o=F.threeIndustry[y];return [y,o['第一产业'],o['第二产业'],o['第三产业'],o['第一产业']+o['第二产业']+o['第三产业']];});
+document.getElementById('tblInd').innerHTML=buildTable(
+  ['年份','第一产业(亿元)','第二产业(亿元)','第三产业(亿元)','合计(亿元)'],indRows);
+
+/* 自适应 */
+window.addEventListener('resize',()=>{[tl,mapChart,radar,gauge,sankey,river,area,
+  timberChart,sunburstChart,treemapChart,heatmapChart,graphChart,
+  picChart,boxChart,parChart,bubbleChart,funnelChart,
+  roseChart,treeChart,worldChart].forEach(c=>c.resize());});
+</script>
+</body>
+</html>
