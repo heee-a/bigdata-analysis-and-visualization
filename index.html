@@ -89,7 +89,7 @@
 <header>
   <div>
     <h1>中国林业资源大数据分析 · 2015–2024</h1>
-    <div class="sub">基于国家统计局、国家林业和草原局、中国林业信息网等权威公开数据，对近十年我国森林资源规模、木材生产、林业产业与造林结构进行交互式可视化。共 26 类高级图表 + 数据总表，拖动时间轴可联动仪表盘与年份快照，并附自包含动画演示。</div>
+    <div class="sub">基于国家统计局、国家林业和草原局、中国林业信息网等权威公开数据，对近十年我国森林资源规模、木材生产、林业产业与造林结构进行交互式可视化。共 31 类高级图表 + 数据总表，拖动时间轴可联动仪表盘与年份快照，并附自包含动画演示。</div>
   </div>
   <div class="badge" id="upd">数据更新：2026-10-27</div>
 </header>
@@ -106,6 +106,8 @@
   <a href="#c18">⑱玫瑰</a><a href="#c19">⑲树图</a><a href="#c20">⑳世界对比</a>
   <a href="#c21">㉑综合</a><a href="#c22">㉒累计</a><a href="#c23">㉓目标</a>
   <a href="#c24">㉔相关</a><a href="#c25">㉕产业</a><a href="#c26">㉖省排序</a>
+  <a href="#c27">㉗产业地图</a><a href="#c28">㉘对称条</a><a href="#c29">㉙家底</a>
+  <a href="#c30">㉚生态雷达</a><a href="#c31">㉛占比</a>
   <a href="#story">数据故事</a><a href="#tables">数据总表</a>
 </nav>
 
@@ -295,6 +297,41 @@
   <h2><span class="dot"></span>㉖ 各省森林覆盖率 · 棒棒糖排序图（降序）</h2>
   <div class="desc">将 34 个省级行政区按森林覆盖率从高到低排序，用"茎+点"棒棒糖呈现，圆点按所属七大区域渐变着色。比普通柱状更清爽，一眼看清"南高北低、西北垫底"的空间格局。</div>
   <div id="lolliChart" class="chart" style="height:560px"></div>
+</section>
+
+<!-- ㉗ 省级产业 地图气泡图 -->
+<section class="card" style="margin-top:18px" id="c27">
+  <h2><span class="dot"></span>㉗ 省级林业产业 · 地图气泡图（2018）</h2>
+  <div class="desc">在地理坐标系上以气泡大小表示省级林业产业总产值（2018，亿元），与②覆盖率分级填色地图互为补充，直观定位"林业产业高地"的空间分布。</div>
+  <div id="indMapChart" class="chart" style="height:520px"></div>
+</section>
+
+<!-- ㉘ 木材产/进 对称条形图 -->
+<section class="card" style="margin-top:18px" id="c28">
+  <h2><span class="dot"></span>㉘ 木材产量 vs 进口量 · 对称条形图（2015–2024）</h2>
+  <div class="desc">以"零轴"为界，向右为国产木材产量、向左为进口量（万 m³），直观对比国内供给与对外进口的此消彼长——进口一侧随依存度下降而收缩。</div>
+  <div id="symChart" class="chart" style="height:470px"></div>
+</section>
+
+<!-- ㉙ 林草生态家底 多仪表盘组 -->
+<section class="card" style="margin-top:18px" id="c29">
+  <h2><span class="dot"></span>㉙ 林草生态"家底" · 多仪表盘（2024 国新办）</h2>
+  <div class="desc">以 2024 年公布数据展示我国林草湿沙四类生态空间的规模（亿亩）：林地 42.53、草原 39.12、湿地 8.34、沙化土地 25.09，2×2 仪表盘组一目了然。</div>
+  <div id="ecoGauge" class="chart" style="height:420px"></div>
+</section>
+
+<!-- ㉚ 生态效益多维雷达 -->
+<section class="card" style="margin-top:18px" id="c30">
+  <h2><span class="dot"></span>㉚ 生态效益多维雷达（2024）</h2>
+  <div class="desc">将碳汇、生态服务价值、带动就业、森林旅游、自然保护地五项生态效益指标归一化到各自量纲上限，呈现我国森林的"生态产出"综合画像。</div>
+  <div id="ecoRadar" class="chart" style="height:440px"></div>
+</section>
+
+<!-- ㉛ 造林方式占比 百分比堆叠面积 -->
+<section class="card" style="margin-top:18px" id="c31">
+  <h2><span class="dot"></span>㉛ 造林方式构成 · 百分比堆叠面积（2015–2019）</h2>
+  <div class="desc">将各造林方式面积换算为当年占比（合计 100%），用堆叠面积展现结构演变：人工造林长期占主导，封山育林、退化林修复等生态修复类比重上升。</div>
+  <div id="compArea" class="chart" style="height:430px"></div>
 </section>
 
 <section class="grid row2" style="margin-top:18px" id="tables">
@@ -927,6 +964,118 @@ const lolliChart = echarts.init(document.getElementById('lolliChart'), null, {re
   });
 })();
 
+/* ---------- ㉗ 省级林业产业 地图气泡图 ---------- */
+const indMapChart = echarts.init(document.getElementById('indMapChart'),'dark');
+function renderIndMap(geo){
+  echarts.registerMap('china',geo);
+  const coord={};
+  (geo.features||[]).forEach(f=>{ if(f.properties&&f.properties.name&&f.properties.center) coord[f.properties.name]=f.properties.center; });
+  const shortMap=F.provinceIndustryShort;
+  const data=F.provinceIndustry.map(p=>{ const full=shortMap[p.name]; return {name:full, value:(coord[full]||[0,0]).concat(p.value)}; });
+  indMapChart.setOption({
+    tooltip:{trigger:'item',formatter:p=>`${p.name}<br/>林业产业产值：<b>${p.value[2]}</b> 亿元（2018）`},
+    geo:{map:'china',roam:true,itemStyle:{areaColor:'#10203a',borderColor:'rgba(120,160,220,.25)'},
+      emphasis:{itemStyle:{areaColor:C.cyan},label:{show:false}}},
+    series:[{type:'scatter',coordinateSystem:'geo',data,
+      symbolSize:v=>Math.sqrt(v[2])/3.0+10,
+      itemStyle:{color:new echarts.graphic.RadialGradient(0.4,0.3,1,[{offset:0,color:'rgba(255,209,102,.95)'},{offset:1,color:'rgba(255,159,90,.4)'}]),borderColor:C.gold,borderWidth:1},
+      label:{show:true,formatter:p=>p.data.name.replace(/省|市|自治区|壮族|回族|维吾尔|特别行政/g,''),position:'top',color:C.sub,fontSize:10},
+      emphasis:{label:{show:true,color:'#fff'}}}]
+  });
+}
+fetch('https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json')
+  .then(r=>r.json()).then(renderIndMap).catch(()=>{});
+
+/* ---------- ㉘ 木材产量 vs 进口量 对称条形图 ---------- */
+const symChart = echarts.init(document.getElementById('symChart'),'dark');
+(function(){
+  const yrs=F.timberTradeYears, prod=F.timber, imp=F.timberImport;
+  symChart.setOption({
+    toolbox:tb,
+    tooltip:{trigger:'axis',axisPointer:{type:'shadow'},
+      formatter:p=>{const i=p[0].dataIndex;return `${yrs[i]} 年<br/>木材产量：<b>${prod[i]}</b> 万m³（右）<br/>进口量：<b>${imp[i]}</b> 万m³（左）`;}},
+    legend:{data:['木材产量（右）','进口量（左）'],top:0,textStyle:{color:C.sub}},
+    grid:{left:64,right:64,top:42,bottom:40},
+    xAxis:{type:'category',data:yrs,axisLabel:{color:C.sub},axisLine:{lineStyle:{color:'rgba(120,160,220,.3)'}}},
+    yAxis:{type:'value',name:'万 m³',axisLabel:{color:C.sub},splitLine:{lineStyle:{color:'rgba(120,160,220,.12)'}}},
+    series:[
+      {name:'木材产量（右）',type:'bar',stack:'t',data:prod,barWidth:'52%',
+        itemStyle:{color:new echarts.graphic.LinearGradient(0,0,1,0,[{offset:0,color:C.green2},{offset:1,color:C.green}]),borderRadius:[0,4,4,0]},
+        label:{show:true,position:'right',color:C.green,fontSize:10,formatter:p=>p.value}},
+      {name:'进口量（左）',type:'bar',stack:'t',data:imp.map(v=>-v),barWidth:'52%',
+        itemStyle:{color:new echarts.graphic.LinearGradient(1,0,0,0,[{offset:0,color:C.cyan},{offset:1,color:'#1f8fd6'}]),borderRadius:[4,0,0,4]},
+        label:{show:true,position:'left',color:C.cyan,fontSize:10,formatter:p=>(-p.value)}}
+    ]
+  });
+})();
+
+/* ---------- ㉙ 林草生态家底 多仪表盘组 ---------- */
+const ecoGauge = echarts.init(document.getElementById('ecoGauge'), null, {renderer:'canvas'});
+(function(){
+  const items=[
+    {name:'林地(亿亩)',value:42.53,max:50,color:C.green},
+    {name:'草原(亿亩)',value:39.12,max:50,color:C.cyan},
+    {name:'湿地(亿亩)',value:8.34,max:20,color:C.purple},
+    {name:'沙化土地(亿亩)',value:25.09,max:40,color:C.orange},
+  ];
+  ecoGauge.setOption({
+    tooltip:{formatter:p=>`${p.name}<br/><b>${p.value}</b> 亿亩`},
+    series: items.map((g,i)=>({
+      type:'gauge',center:[(i%2===0?27:73)+'%',(i<2?34:78)+'%'],radius:'42%',min:0,max:g.max,splitNumber:4,
+      progress:{show:true,width:10,itemStyle:{color:g.color}},
+      axisLine:{lineStyle:{width:10,color:[[1,'rgba(120,160,220,.15)']]}},
+      axisTick:{show:false},splitLine:{show:false},axisLabel:{show:false},
+      pointer:{show:true,width:4,itemStyle:{color:g.color}},
+      anchor:{show:true,size:6,itemStyle:{color:g.color}},
+      title:{offsetCenter:[0,'64%'],color:C.sub,fontSize:11},
+      detail:{valueAnimation:true,offsetCenter:[0,'32%'],fontSize:17,fontWeight:'bold',color:'#fff',formatter:'{value}'},
+      data:[{value:g.value,name:g.name}]
+    }))
+  });
+})();
+
+/* ---------- ㉚ 生态效益多维雷达 ---------- */
+const ecoRadar = echarts.init(document.getElementById('ecoRadar'),'dark');
+(function(){
+  const items=[
+    {n:'年碳汇(亿吨)',v:12,max:15},
+    {n:'生态服务价值(万亿)',v:15.88,max:20},
+    {n:'带动就业(万人)',v:4000,max:5000},
+    {n:'森林旅游(亿人次)',v:39.06,max:45},
+    {n:'自然保护地(万个)',v:1.18,max:2},
+  ];
+  ecoRadar.setOption({
+    toolbox:tb,tooltip:{},
+    radar:{indicator:items.map(it=>({name:it.n,max:it.max})),
+      axisName:{color:C.sub},splitLine:{lineStyle:{color:'rgba(120,160,220,.18)'}},
+      splitArea:{areaStyle:{color:['rgba(46,230,160,.04)','rgba(54,211,255,.04)']}},
+      axisLine:{lineStyle:{color:'rgba(120,160,220,.25)'}}},
+    series:[{type:'radar',data:[{value:items.map(it=>it.v),name:'2024 生态效益',
+      areaStyle:{color:'rgba(54,211,255,.32)'},lineStyle:{color:C.cyan,width:2},itemStyle:{color:C.cyan}}]}]
+  });
+})();
+
+/* ---------- ㉛ 造林方式构成 百分比堆叠面积 ---------- */
+const compArea = echarts.init(document.getElementById('compArea'), null, {renderer:'canvas'});
+(function(){
+  const cats=F.afforestationCompositionCats, yrs=F.afforestationCompositionYears, rows=F.afforestationComposition;
+  const pct = rows.map(row=>{const s=row.reduce((a,b)=>a+b,0);return row.map(v=>+((v/s)*100).toFixed(1));});
+  const palette=[C.green,C.cyan,C.gold,C.purple,C.orange];
+  compArea.setOption({
+    toolbox:tb,
+    tooltip:{trigger:'axis',axisPointer:{type:'line'},valueFormatter:v=>v+'%'},
+    legend:{data:cats,top:0,textStyle:{color:C.sub}},
+    grid:{left:50,right:30,top:42,bottom:40},
+    xAxis:{type:'category',boundaryGap:false,data:yrs.map(String),axisLabel:{color:C.sub},axisLine:{lineStyle:{color:'rgba(120,160,220,.3)'}}},
+    yAxis:{type:'value',max:100,name:'占比(%)',nameTextStyle:{color:C.sub},axisLabel:{color:C.sub},splitLine:{lineStyle:{color:'rgba(120,160,220,.12)'}}},
+    series: cats.map((c,ci)=>({
+      name:c,type:'line',stack:'pct',areaStyle:{opacity:.78},smooth:true,symbol:'none',
+      lineStyle:{width:1,color:palette[ci]},itemStyle:{color:palette[ci]},emphasis:{focus:'series'},
+      data:pct.map(r=>r[ci])
+    }))
+  });
+})();
+
 /* ---------- 数据故事：滚动揭示 ---------- */
 const coEls=document.querySelectorAll('.callout');
 if('IntersectionObserver' in window){
@@ -962,7 +1111,8 @@ window.addEventListener('resize',()=>{[tl,mapChart,radar,gauge,sankey,river,area
   timberChart,sunburstChart,treemapChart,heatmapChart,graphChart,
   picChart,boxChart,parChart,bubbleChart,funnelChart,
   roseChart,treeChart,worldChart,idxChart,
-  cumAffChart,targetGauge,corrChart,threeIndChart,lolliChart].forEach(c=>c.resize());});
+  cumAffChart,targetGauge,corrChart,threeIndChart,lolliChart,
+  indMapChart,symChart,ecoGauge,ecoRadar,compArea].forEach(c=>c.resize());});
 </script>
 </body>
 </html>
