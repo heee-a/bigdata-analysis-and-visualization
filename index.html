@@ -32,6 +32,22 @@
   .kpi .v{font-size:clamp(22px,2.6vw,32px);font-weight:800;line-height:1.1}
   .kpi .l{color:var(--sub);font-size:13px;margin-top:6px}
   .kpi .t{font-size:11px;color:var(--gold);margin-top:8px;opacity:.9}
+  .kpi .chg{display:inline-flex;align-items:center;gap:3px;font-size:12px;font-weight:700;margin-top:9px;
+    padding:2px 9px;border-radius:9px}
+  .kpi .chg.up{color:#36e29e;background:rgba(54,226,158,.12)}
+  .kpi .chg.down{color:#ff6b81;background:rgba(255,107,129,.12)}
+  .kpi .chg .lab{font-size:10px;font-weight:500;opacity:.75;color:var(--sub)}
+  /* 驾驶舱 · 数据速读 */
+  .read{background:linear-gradient(135deg,rgba(54,211,255,.07),rgba(46,230,160,.05));
+    border:1px solid var(--line);border-radius:16px;padding:16px 20px;margin:14px 0 4px;display:flex;gap:14px;align-items:flex-start}
+  .read .ic{flex:0 0 auto;width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+    background:rgba(54,211,255,.12);color:var(--cyan);font-size:18px}
+  .read .body{flex:1}
+  .read .hd{font-size:13px;font-weight:700;color:var(--cyan);margin-bottom:4px;display:flex;align-items:center;gap:8px}
+  .read .hd .yr{font-size:12px;color:var(--gold);background:rgba(255,209,102,.1);padding:1px 9px;border-radius:8px}
+  .read .txt{font-size:13.5px;line-height:1.85;color:var(--txt)}
+  .read .txt b{color:var(--green);font-weight:700}
+  .read .txt .n{color:var(--cyan);font-weight:700}
   .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 20px 8px;backdrop-filter:blur(6px)}
   .card h2{font-size:16px;font-weight:700;margin-bottom:2px;display:flex;align-items:center;gap:9px}
   .card h2 .dot{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 12px var(--green)}
@@ -89,7 +105,7 @@
 <header>
   <div>
     <h1>中国林业资源大数据分析 · 2015–2024</h1>
-    <div class="sub">基于国家统计局、国家林业和草原局、中国林业信息网等权威公开数据，对近十年我国森林资源规模、木材生产、林业产业与造林结构进行交互式可视化。共 31 类高级图表 + 数据总表，拖动时间轴可联动仪表盘与年份快照，并附自包含动画演示。</div>
+    <div class="sub">基于国家统计局、国家林业和草原局、中国林业信息网等权威公开数据，对近十年我国森林资源规模、木材生产、林业产业与造林结构进行交互式可视化。共 31 类高级图表 + 数据总表；顶部 KPI 卡片带涨跌指示，拖动时间轴实时驱动"数据速读"文字摘要与年份快照联动，并附自包含动画演示。</div>
   </div>
   <div class="badge" id="upd">数据更新：2026-10-27</div>
 </header>
@@ -108,11 +124,20 @@
   <a href="#c24">㉔相关</a><a href="#c25">㉕产业</a><a href="#c26">㉖省排序</a>
   <a href="#c27">㉗产业地图</a><a href="#c28">㉘对称条</a><a href="#c29">㉙家底</a>
   <a href="#c30">㉚生态雷达</a><a href="#c31">㉛占比</a>
-  <a href="#story">数据故事</a><a href="#tables">数据总表</a>
+  <a href="#kpis">驾驶舱</a><a href="#story">数据故事</a><a href="#tables">数据总表</a>
 </nav>
 
 <!-- KPI 卡片 -->
 <section class="grid kpis" id="kpis"></section>
+
+<!-- 驾驶舱 · 数据速读（联动时间轴） -->
+<section class="read" id="readPanel">
+  <div class="ic">📊</div>
+  <div class="body">
+    <div class="hd">数据速读 · 林业发展驾驶舱 <span class="yr" id="readYear">2015</span></div>
+    <div class="txt" id="readTxt"></div>
+  </div>
+</section>
 
 <!-- ① 时间轴动画 -->
 <section class="card" style="margin-top:18px" id="c1">
@@ -377,21 +402,22 @@ const tb = {show:true,right:14,top:6,iconStyle:{borderColor:C.sub},
 
 /* ---------- KPI 卡片 ---------- */
 const kpis = [
-  {v:25.09, l:'森林覆盖率 (%)', t:'2024 · 超 2030 目标', c:C.green, suf:'%'},
-  {v:209.88, l:'森林蓄积量 (亿 m³)', t:'2024 · 提前达标', c:C.cyan, suf:'', dec:2},
-  {v:2.41, l:'森林面积 (亿公顷)', t:'2024 估算', c:C.green2, suf:'', dec:2},
-  {v:8000, l:'人工林面积 (万公顷)', t:'世界第一', c:C.gold, suf:''},
-  {v:10.17, l:'林草产业年产值 (万亿)', t:'2024 突破 10 万亿', c:C.purple, suf:'', dec:2},
-  {v:5, l:'国家公园 (个)', t:'首批设立', c:C.pink, suf:''},
-  {v:31.38, l:'木材对外依存度 (%)', t:'2024 · 较2015降约20pct', c:C.orange, suf:'', dec:2},
-  {v:12, l:'森林年碳汇量 (亿吨)', t:'2023 达 12 亿吨以上', c:C.cyan, suf:'', dec:0},
-  {v:4000, l:'集体林业带动就业 (万人)', t:'每年', c:C.purple, suf:'', dec:0},
-  {v:39.12, l:'草原面积 (亿亩)', t:'2024 生态家底', c:C.gold, suf:'', dec:2},
+  {v:25.09, l:'森林覆盖率 (%)', t:'2024 · 超 2030 目标', c:C.green, suf:'%', chg:'+2.13pct', chgLab:'较2018', good:true},
+  {v:209.88, l:'森林蓄积量 (亿 m³)', t:'2024 · 提前达标', c:C.cyan, suf:'', dec:2, chg:'+37.9%', chgLab:'较2015', good:true},
+  {v:2.41, l:'森林面积 (亿公顷)', t:'2024 估算', c:C.green2, suf:'', dec:2, chg:'+37.8%', chgLab:'较2015', good:true},
+  {v:8000, l:'人工林面积 (万公顷)', t:'世界第一', c:C.gold, suf:'', chg:'稳居首位', chgLab:'全球', good:true},
+  {v:10.17, l:'林草产业年产值 (万亿)', t:'2024 突破 10 万亿', c:C.purple, suf:'', dec:2, chg:'+71.3%', chgLab:'较2015', good:true},
+  {v:5, l:'国家公园 (个)', t:'首批设立', c:C.pink, suf:'', chg:'从无到有', chgLab:'2021起', good:true},
+  {v:31.38, l:'木材对外依存度 (%)', t:'2024 · 较2015降约20pct', c:C.orange, suf:'', dec:2, chg:'-19.6pct', chgLab:'较2015', good:true},
+  {v:12, l:'森林年碳汇量 (亿吨)', t:'2023 达 12 亿吨以上', c:C.cyan, suf:'', dec:0, chg:'持续增汇', chgLab:'年际', good:true},
+  {v:4000, l:'集体林业带动就业 (万人)', t:'每年', c:C.purple, suf:'', dec:0, chg:'惠农增收', chgLab:'长效', good:true},
+  {v:39.12, l:'草原面积 (亿亩)', t:'2024 生态家底', c:C.gold, suf:'', dec:2, chg:'稳中向好', chgLab:'生态', good:true},
 ];
 const kpiBox = document.getElementById('kpis');
 kpis.forEach(k=>{
   const el=document.createElement('div'); el.className='kpi';
-  el.innerHTML=`<div class="v" style="color:${k.c}" data-target="${k.v}" data-dec="${k.dec||0}" data-suf="${k.suf||''}">0</div><div class="l">${k.l}</div><div class="t">${k.t}</div>`;
+  const chg = k.chg ? `<div class="chg ${k.good?'up':'down'}">${k.good?'▲':'▼'} ${k.chg} <span class="lab">${k.chgLab}</span></div>` : '';
+  el.innerHTML=`<div class="v" style="color:${k.c}" data-target="${k.v}" data-dec="${k.dec||0}" data-suf="${k.suf||''}">0</div><div class="l">${k.l}</div><div class="t">${k.t}</div>${chg}`;
   kpiBox.appendChild(el);
 });
 function countUp(){
@@ -538,8 +564,26 @@ function applyYear(i){
   snapDefs.forEach(d=>{ document.getElementById('snap_'+d.k).textContent=d.arr[i].toFixed(d.dec); });
   // 仪表盘同步到该年（插值估算）覆盖率
   gauge.setOption({series:[{data:[{value:+F.coverageEst[i], name:y+' 年森林覆盖率(估)'}]}]});
+  updateRead(i);
 }
 applyYear(tl.getCurrentOption().baseOption.timeline.currentIndex);
+
+/* ---------- 驾驶舱 · 数据速读（联动时间轴） ---------- */
+const dep = F.timberDependency;          // 对外依存度 %
+const base = F.outputValue[0];           // 2015 基准
+function updateRead(i){
+  const y = years[i];
+  const ov = F.outputValue[i], tk = F.timber[i], cov = F.coverageEst[i];
+  const stk = F.stockEst[i], aff = F.afforestation[i], deps = dep[i];
+  const growth = ((ov/base - 1) * 100).toFixed(1);
+  const vs2015 = i>0 ? `较 2015 年（${base} 亿元）增长 <span class="n">${growth}%</span>` : '为十年观测起点';
+  document.getElementById('readYear').textContent = y;
+  document.getElementById('readTxt').innerHTML =
+    `【${y} 年速读】全国林业产业总产值达 <b>${ov.toLocaleString()}</b> 亿元，${vs2015}；` +
+    `木材产量 <b>${tk.toLocaleString()}</b> 万 m³，对外依存度降至 <span class="n">${deps}%</span>，国内供给保障持续增强；` +
+    `森林覆盖率估计达 <b>${cov}%</b>${cov>=25?'，已提前实现 2030 年 25% 目标':''}，森林蓄积量约 <span class="n">${stk}</span> 亿 m³，生态家底进一步厚植；` +
+    `当年造林面积 <b>${aff}</b> 万公顷，国土绿化稳步推进。`;
+}
 
 /* ---------- ⑤ 桑基图 ---------- */
 const sankey=echarts.init(document.getElementById('sankeyChart'),'dark');
