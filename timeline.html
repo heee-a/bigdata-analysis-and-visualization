@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>中国林业十年发展大事记（2015—2024）</title>
+<script src="assets/echarts.min.js"></script>
+<script src="data.js"></script>
+<style>
+  :root{
+    --bg:#0b1220; --bg2:#111c30; --card:#15233c; --line:#26395c;
+    --txt:#e8eef8; --sub:#9fb2d0; --green:#2ee6a0; --cyan:#36d3ff;
+    --gold:#ffd166; --purple:#a78bfa; --pink:#ff7eb6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    background:radial-gradient(1200px 600px at 20% -10%,#16305a 0%,transparent 60%),
+               radial-gradient(1000px 500px at 90% 10%,#0d3b33 0%,transparent 55%),
+               var(--bg);
+    color:var(--txt);min-height:100vh;padding:26px clamp(16px,3vw,44px) 60px}
+  .wrap{max-width:1180px;margin:0 auto}
+
+  /* 头部 */
+  header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;
+    padding-bottom:20px;border-bottom:1px solid var(--line);margin-bottom:26px}
+  header h1{font-size:clamp(22px,3.4vw,34px);font-weight:800;letter-spacing:.5px}
+  header h1 .em{background:linear-gradient(90deg,var(--green),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+  header .sub{font-size:12.5px;color:var(--sub);margin-top:8px;max-width:760px;line-height:1.7}
+  .nav{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .nav a{font-size:12px;color:var(--sub);text-decoration:none;border:1px solid var(--line);
+    padding:5px 12px;border-radius:18px;transition:.18s}
+  .nav a:hover{color:var(--green);border-color:var(--green)}
+  .nav a.me{color:var(--green);border-color:var(--green);background:rgba(46,230,160,.1)}
+
+  /* 概览条 */
+  .overview{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:30px}
+  @media(max-width:760px){.overview{grid-template-columns:repeat(2,1fr)}}
+  .ov{background:linear-gradient(145deg,rgba(21,35,60,.9),rgba(17,28,48,.9));border:1px solid var(--line);
+    border-radius:14px;padding:16px 18px;position:relative;overflow:hidden}
+  .ov::after{content:'';position:absolute;right:-20px;top:-20px;width:80px;height:80px;border-radius:50%;
+    background:radial-gradient(circle,rgba(46,230,160,.18),transparent 70%)}
+  .ov .n{font-size:clamp(22px,3vw,32px);font-weight:800;line-height:1}
+  .ov .l{font-size:11.5px;color:var(--sub);margin-top:8px}
+
+  /* 分区标题 */
+  .sec{margin:34px 0 16px;display:flex;align-items:center;gap:12px}
+  .sec .dot{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 12px var(--green)}
+  .sec h2{font-size:19px;font-weight:800}
+  .sec .line{flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+
+  /* 年度大事记时间轴 */
+  .timeline{position:relative;padding-left:34px}
+  .timeline::before{content:'';position:absolute;left:10px;top:6px;bottom:6px;width:2px;
+    background:linear-gradient(180deg,var(--green),var(--cyan),var(--purple),var(--gold))}
+  .event{position:relative;margin-bottom:16px;background:linear-gradient(120deg,rgba(21,35,60,.92),rgba(17,28,48,.92));
+    border:1px solid var(--line);border-radius:14px;padding:15px 20px;transition:.2s}
+  .event:hover{border-color:var(--green);transform:translateX(4px)}
+  .event::before{content:'';position:absolute;left:-29px;top:22px;width:12px;height:12px;border-radius:50%;
+    background:var(--bg);border:3px solid var(--green);box-shadow:0 0 0 4px rgba(46,230,160,.12)}
+  .event .head{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .event .yr{font-size:19px;font-weight:800;color:var(--green);min-width:56px}
+  .event .tag{font-size:10.5px;padding:2px 9px;border-radius:12px;font-weight:700}
+  .tag.policy{background:rgba(54,211,255,.14);color:var(--cyan)}
+  .tag.eco{background:rgba(46,230,160,.14);color:var(--green)}
+  .tag.data{background:rgba(255,209,102,.14);color:var(--gold)}
+  .tag.mile{background:rgba(167,139,250,.14);color:var(--purple)}
+  .event h3{font-size:14.5px;font-weight:700;flex:1;min-width:200px}
+  .event p{font-size:12.5px;color:var(--sub);margin-top:7px;line-height:1.75}
+  .event .kpi{display:inline-block;margin-top:8px;font-size:11px;color:var(--gold);
+    background:rgba(255,209,102,.08);border-radius:6px;padding:3px 9px}
+
+  /* 国家公园卡片 */
+  .parks{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+  .park{background:linear-gradient(150deg,rgba(21,35,60,.95),rgba(13,30,29,.95));border:1px solid var(--line);
+    border-radius:14px;padding:16px;position:relative;overflow:hidden}
+  .park .ico{font-size:26px;margin-bottom:8px}
+  .park h4{font-size:14px;font-weight:800;color:var(--green)}
+  .park .prov{font-size:11px;color:var(--sub);margin-top:3px}
+  .park .area{font-size:20px;font-weight:800;color:var(--cyan);margin-top:10px}
+  .park .area small{font-size:11px;color:var(--sub);font-weight:500}
+  .park .feat{font-size:11px;color:var(--sub);margin-top:8px;line-height:1.6;border-top:1px dashed var(--line);padding-top:8px}
+
+  /* 图表卡 */
+  .charts{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:900px){.charts{grid-template-columns:1fr}}
+  .card{background:linear-gradient(145deg,rgba(21,35,60,.9),rgba(17,28,48,.9));border:1px solid var(--line);
+    border-radius:14px;padding:14px 16px 8px}
+  .card h3{font-size:13.5px;font-weight:700}
+  .card .sub{font-size:10.5px;color:var(--sub);margin:3px 0 6px}
+  .chart{width:100%;height:320px}
+
+  footer{color:var(--sub);font-size:11px;line-height:1.8;margin-top:34px;padding-top:16px;border-top:1px solid var(--line)}
+  footer b{color:var(--txt)}
+  footer a{color:var(--green);text-decoration:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <h1>中国林业十年发展<span class="em">大事记</span></h1>
+      <div class="sub">2015—2024 · 以政策里程碑与关键事件为线索，回望十年"增绿与增收"的制度轨迹。所有时间节点与数据均来自国家林草局、国务院、国家统计局等权威公开信息。</div>
+      <nav class="nav">
+        <a href="index.html">📊 交互仪表盘</a>
+        <a href="dashboard.html">🖥 驾驶舱大屏</a>
+        <a href="report.html">📄 数据分析报告</a>
+        <a href="timeline.html" class="me">🕰 发展大事记</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="overview">
+    <div class="ov"><div class="n" style="color:var(--green)">10<span style="font-size:14px"> 年</span></div><div class="l">2015—2024 观测窗口</div></div>
+    <div class="ov"><div class="n" style="color:var(--cyan)">5<span style="font-size:14px"> 个</span></div><div class="l">首批国家公园（2021 设立）</div></div>
+    <div class="ov"><div class="n" style="color:var(--gold)">23<span style="font-size:14px"> 万km²</span></div><div class="l">首批国家公园保护面积</div></div>
+    <div class="ov"><div class="n" style="color:var(--purple)">30<span style="font-size:14px">%</span></div><div class="l">涵盖陆域重点保护野生动植物种类</div></div>
+  </section>
+
+  <div class="sec"><span class="dot"></span><h2>十年大事记 · 政策与里程碑</h2><span class="line"></span></div>
+  <div class="timeline" id="timeline"></div>
+
+  <div class="sec"><span class="dot" style="background:var(--cyan);box-shadow:0 0 12px var(--cyan)"></span><h2>首批国家公园 · 名录</h2><span class="line"></span></div>
+  <div class="parks" id="parks"></div>
+
+  <div class="sec"><span class="dot" style="background:var(--gold);box-shadow:0 0 12px var(--gold)"></span><h2>里程碑数据可视化</h2><span class="line"></span></div>
+  <div class="charts">
+    <div class="card"><h3>各年关键事件数量</h3>
+      <div class="sub">按年份统计本时间轴收录的重大事件</div><div id="t_chart1" class="chart"></div></div>
+    <div class="card"><h3>首批国家公园保护面积构成</h3>
+      <div class="sub">单位：万 km² · 三源一带占比突出</div><div id="t_chart2" class="chart"></div></div>
+  </div>
+
+  <footer>
+    <b>数据来源：</b>国家林业和草原局（首批国家公园设立公告、《国家公园空间布局方案》）、国务院、国家统计局、国新办新闻发布会、《中华人民共和国森林法》。<br>
+    <b>说明：</b>时间轴为公开重大事件的梳理，政策类节点为国务院/国家林草局公开发布的时间；国家公园面积为约数。本页为数据可视化教学展示用途。<br>
+    <b>同源项目：</b><a href="index.html">交互仪表盘</a> · <a href="dashboard.html">驾驶舱大屏</a> · <a href="report.html">数据分析报告</a>。
+  </footer>
+</div>
+
+<script>
+const F = window.FOREST;
+
+/* ---------- 大事记数据（权威公开事件） ---------- */
+const events = [
+  { year:2015, tag:'policy', type:'政策', title:'国家公园体制试点启动',
+    desc:'我国陆续选取三江源、东北虎豹、大熊猫、祁连山、海南热带雨林、武夷山、神农架、钱江源、南山、香格里拉普达措等 10 地开展国家公园体制试点，探索破解保护地"九龙治水"难题。',
+    kpi:'10 个国家公园体制试点' },
+  { year:2016, tag:'policy', type:'政策', title:'"十三五"生态保护建设规划实施',
+    desc:'《"十三五"生态环境保护规划》与林业相关政策推进实施，天然林保护、退耕还林、防护林体系建设等重大生态工程持续发力。',
+    kpi:'天然林商业性采伐全面停止' },
+  { year:2017, tag:'eco', type:'生态', title:'森林覆盖率稳步提升至约 22%',
+    desc:'第九次全国森林资源清查（2014—2018）期间，森林面积与蓄积量实现"双增长"，森林覆盖率由第八次清查期末的 21.63% 向 22.96% 迈进。',
+    kpi:'森林覆盖率 21.63% → 22.96%（2013→2018）' },
+  { year:2018, tag:'mile', type:'里程碑', title:'第九次森林资源清查期末 + 首期森林资源核算',
+    desc:'第九次全国森林资源清查期末，全国林地林木资产总价值 25.05 万亿元，森林生态服务年价值 15.88 万亿元，森林文化价值首次评估约 3.10 万亿元。',
+    kpi:'绿色资产 25.05 万亿元' },
+  { year:2019, tag:'policy', type:'政策', title:'新修订《森林法》通过',
+    desc:'修订后的《中华人民共和国森林法》获全国人大常委会通过（2020 年 7 月 1 日起施行），确立"保护优先、保育结合、可持续发展"原则，为新时代林业发展提供法治保障。',
+    kpi:'2020-07-01 施行' },
+  { year:2020, tag:'policy', type:'政策', title:'"双碳"目标提出，森林碳汇受关注',
+    desc:'我国向世界作出"二氧化碳排放力争 2030 年前达峰、2060 年前实现碳中和"的庄严承诺，森林作为重要碳汇的战略地位愈发凸显。',
+    kpi:'2030 碳达峰 · 2060 碳中和' },
+  { year:2021, tag:'mile', type:'里程碑', title:'首批 5 个国家公园正式设立',
+    desc:'2021 年 10 月 12 日，习近平主席在联合国《生物多样性公约》第十五次缔约方大会领导人峰会宣布：正式设立三江源、大熊猫、东北虎豹、海南热带雨林、武夷山第一批国家公园。',
+    kpi:'5 个国家公园 · 23 万 km²' },
+  { year:2021, tag:'policy', type:'政策', title:'林长制全面建立',
+    desc:'全面推行林长制，建立省、市、县、乡、村五级林长体系，压实地方党委政府保护发展森林草原资源的主体责任，实现"山有人管、林有人护、责有人担"。',
+    kpi:'五级林长体系' },
+  { year:2022, tag:'policy', type:'政策', title:'《国家公园空间布局方案》发布',
+    desc:'国家林草局发布《国家公园空间布局方案》，规划布局 49 个国家公园候选区，总面积约 110 万 km²，覆盖 5000 多种野生脊椎动物和 2.9 万多种高等植物，建设全世界最大的国家公园体系。',
+    kpi:'49 个候选区 · 约 110 万 km²' },
+  { year:2023, tag:'data', type:'数据', title:'森林覆盖率超过 25%',
+    desc:'据国土绿化公报，全国森林覆盖率超过 25%，森林蓄积量持续增加；森林年碳汇量达 12 亿吨以上，林草产业保持稳定增长。',
+    kpi:'森林覆盖率 > 25%' },
+  { year:2024, tag:'mile', type:'里程碑', title:'多项 2030 目标提前实现',
+    desc:'国新办公布：2024 年全国森林覆盖率达 25.09%、森林蓄积量达 209.88 亿 m³，双双提前实现 2030 年目标；林草产业总产值突破 10 万亿元，达 10.17 万亿元。',
+    kpi:'覆盖率 25.09% · 蓄积量 209.88 亿 m³' },
+];
+
+/* 渲染时间轴 */
+const tagColor={policy:'var(--cyan)',eco:'var(--green)',data:'var(--gold)',mile:'var(--purple)'};
+const tl=document.getElementById('timeline');
+events.forEach(e=>{
+  const el=document.createElement('div');el.className='event';
+  el.innerHTML=`<div class="head"><span class="yr">${e.year}</span>
+    <span class="tag ${e.tag}">${e.type}</span><h3>${e.title}</h3></div>
+    <p>${e.desc}</p><span class="kpi">▸ ${e.kpi}</span>`;
+  tl.appendChild(el);
+});
+
+/* 渲染国家公园卡片 */
+const parkIco={'三江源国家公园':'🏔️','大熊猫国家公园':'🐼','东北虎豹国家公园':'🐯',
+  '海南热带雨林国家公园':'🌴','武夷山国家公园':'🌿'};
+const pk=document.getElementById('parks');
+F.nationalParkList.forEach(p=>{
+  const el=document.createElement('div');el.className='park';
+  el.innerHTML=`<div class="ico">${parkIco[p.name]||'🌲'}</div><h4>${p.name}</h4>
+    <div class="prov">📍 ${p.province}</div>
+    <div class="area">${p.area}<small> 万 km²</small></div>
+    <div class="feat">${p.feature}</div>`;
+  pk.appendChild(el);
+});
+
+/* 图表主题 */
+const AX={color:'#9fb2d0',fontSize:10};
+const SPLIT={lineStyle:{color:'rgba(120,160,220,.12)'}};
+const tb={feature:{saveAsImage:{backgroundColor:'#0b1220'},dataView:{}},right:4,top:0,iconStyle:{borderColor:'#9fb2d0'}};
+const charts=[];
+const mk=id=>{const c=echarts.init(document.getElementById(id),null,{renderer:'canvas'});charts.push(c);return c};
+
+/* 图1 各年事件数 */
+(function(){
+  const c=mk('t_chart1');
+  const cnt={};events.forEach(e=>cnt[e.year]=(cnt[e.year]||0)+1);
+  const yrs=Object.keys(cnt).sort();
+  c.setOption({toolbox:tb,tooltip:{trigger:'axis',formatter:p=>`${p[0].axisValue} 年<br/>${p[0].value} 件大事`},
+    grid:{left:34,right:12,top:14,bottom:26},
+    xAxis:{type:'category',data:yrs,axisLabel:{...AX,rotate:35}},
+    yAxis:{type:'value',minInterval:1,axisLabel:AX,splitLine:SPLIT},
+    series:[{type:'bar',data:yrs.map(y=>cnt[y]),barWidth:'55%',
+      itemStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#36d3ff'},{offset:1,color:'#2ee6a0'}]),borderRadius:[4,4,0,0]},
+      label:{show:true,position:'top',color:'#e8eef8',fontSize:10}}]});
+})();
+
+/* 图2 国家公园面积构成 玫瑰图 */
+(function(){
+  const c=mk('t_chart2');
+  const data=F.nationalParkList.map((p,i)=>({name:p.name.replace('国家公园',''),value:p.area}));
+  const cols=['#2ee6a0','#36d3ff','#ffd166','#a78bfa','#ff7eb6'];
+  c.setOption({toolbox:tb,tooltip:{trigger:'item',formatter:p=>`${p.name}<br/>${p.value} 万 km²`},
+    legend:{bottom:2,textStyle:{color:'#9fb2d0',fontSize:10},data:data.map(x=>x.name)},
+    series:[{type:'pie',radius:[18,'68%'],center:['50%','46%'],roseType:'area',
+      itemStyle:{borderRadius:5,borderColor:'#0b1220',borderWidth:2},
+      label:{formatter:p=>`${p.name}\n${p.value}`,color:'#e8eef8',fontSize:10},
+      data:data.map((x,i)=>({...x,itemStyle:{color:cols[i]}}))}]});
+})();
+
+window.addEventListener('resize',()=>charts.forEach(c=>c.resize()));
+</script>
+</body>
+</html>
