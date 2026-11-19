@@ -98,7 +98,9 @@ python -m http.server 8080
 - 地图组件需在**联网**环境下加载中国地理边界（来自 DataV GeoAtlas）；其余图表完全离线可用。
 - 数据集中在 `data.js`，如需更新只需修改该文件。
 
-> **在线仓库 / 演示**：GitHub 仓库 `heee-a/bigdata-analysis-and-visualization`（中文名可在仓库 Settings → Repository name 中改回"大数据分析及数据可视化"）；在线仪表盘（GitHub Pages）：`https://heee-a.github.io/bigdata-analysis-and-visualization/`
+> **在线仓库 / 演示**：GitHub 仓库 `heee-a/bigdata-analysis-and-visualization`（中文名可在仓库 Settings → Repository name 中改回"大数据分析及数据可视化"）。
+> - 深色主仪表盘（GitHub Pages）：`https://heee-a.github.io/bigdata-analysis-and-visualization/`
+> - 浅色可视化大屏：`https://heee-a.github.io/bigdata-analysis-and-visualization/dashboard.html`（或点主仪表盘右上角"🖥 可视化大屏"按钮）
 
 ---
 
@@ -119,6 +121,7 @@ python -m http.server 8080
 ├── dashboard.html      # 可视化大屏（浅色驾驶舱风格：标题栏+核心数字+年份切换+6张KPI卡+数据速读+5分区10图，与主页同源数据）
 ├── data.js             # 结构化数据集（含来源与口径注释）
 ├── assets/
+│   ├── echarts.min.js         # ECharts 5.5.0 本地库（避免 CDN 依赖，确保离线/全球可渲染）
 │   ├── forest_demo.svg        # 自包含动画演示（产值/木材十年增长）
 │   ├── forest_demo_timber.svg # 自包含动画演示（木材对外依存度下降）
 │   └── forest_demo_region.svg # 自包含动画演示（七大区域覆盖率）
