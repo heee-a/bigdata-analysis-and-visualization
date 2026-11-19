@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>中国林业十年发展数据分析报告（2015—2024）</title>
+<script src="assets/echarts.min.js"></script>
+<script src="data.js"></script>
+<style>
+  :root{
+    --paper:#faf9f5; --card:#ffffff; --ink:#1c2b24; --sub:#5a6b62; --faint:#8a968e;
+    --green:#0b6e4f; --green2:#14996c; --gold:#b08421; --line:#e6e2d6; --red:#b0413e;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:var(--paper);
+    color:var(--ink);line-height:1.85;font-size:15px}
+  .wrap{max-width:920px;margin:0 auto;padding:0 22px 80px}
+
+  /* 封面 */
+  .cover{text-align:center;padding:60px 20px 44px;border-bottom:3px double var(--green);margin-bottom:34px}
+  .cover .kicker{font-size:12px;letter-spacing:5px;color:var(--gold);text-transform:uppercase;font-weight:700}
+  .cover h1{font-family:"Songti SC","Noto Serif SC",serif;font-size:clamp(30px,5vw,48px);
+    font-weight:800;line-height:1.3;margin:16px 0 10px;color:var(--green)}
+  .cover .sub{font-family:"Songti SC",serif;font-size:clamp(15px,2.4vw,20px);color:var(--sub)}
+  .cover .meta{margin-top:22px;font-size:12.5px;color:var(--faint);letter-spacing:.5px}
+  .cover .lead{margin:26px auto 0;max-width:720px;font-size:15px;color:#40564a;
+    font-family:"Songti SC",serif;border-left:3px solid var(--gold);padding-left:18px;text-align:left;line-height:2}
+
+  /* 摘要数字 */
+  .abstract{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:30px 0}
+  @media(max-width:720px){.abstract{grid-template-columns:repeat(2,1fr)}}
+  .abs-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 16px;text-align:center;
+    box-shadow:0 3px 14px rgba(28,43,36,.05)}
+  .abs-card .n{font-size:clamp(24px,3.6vw,34px);font-weight:800;color:var(--green);line-height:1}
+  .abs-card .n small{font-size:13px;color:var(--sub);margin-left:2px}
+  .abs-card .l{font-size:12px;color:var(--sub);margin-top:9px}
+
+  /* 目录 */
+  .toc{background:#f2efe6;border:1px solid var(--line);border-radius:12px;padding:18px 22px;margin-bottom:40px}
+  .toc h3{font-size:13px;color:var(--gold);letter-spacing:2px;margin-bottom:10px;font-weight:700}
+  .toc ol{display:grid;grid-template-columns:1fr 1fr;gap:6px 28px;list-style:none;counter-reset:t}
+  @media(max-width:640px){.toc ol{grid-template-columns:1fr}}
+  .toc li{counter-increment:t;font-size:13.5px}
+  .toc li::before{content:counter(t,decimal-leading-zero);color:var(--gold);font-weight:700;margin-right:9px}
+  .toc a{color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--faint)}
+  .toc a:hover{color:var(--green)}
+
+  /* 章节 */
+  .chapter{margin:52px 0}
+  .chapter h2{font-family:"Songti SC","Noto Serif SC",serif;font-size:27px;color:var(--green);
+    display:flex;align-items:baseline;gap:14px;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:22px}
+  .chapter h2 .no{font-family:"Segoe UI",sans-serif;font-size:15px;color:var(--gold);font-weight:800;
+    background:#f2efe6;border-radius:8px;padding:3px 11px}
+  .chapter p{margin:16px 0;color:#33483d;text-align:justify}
+  .chapter p .hi{color:var(--green);font-weight:800}
+  .chapter p .hl{background:linear-gradient(transparent 62%,rgba(176,132,33,.22) 0);font-weight:700}
+  .figure{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px 12px;margin:22px 0;
+    box-shadow:0 4px 18px rgba(28,43,36,.05)}
+  .figure .ft{font-size:14px;font-weight:800;color:var(--ink)}
+  .figure .fc{font-size:11.5px;color:var(--faint);margin:3px 0 8px}
+  .chart{width:100%;height:340px}
+  .chart.short{height:300px}
+  .figNote{font-size:11px;color:var(--faint);margin-top:6px;border-top:1px dashed var(--line);padding-top:8px}
+  .pull{background:#f2f7f3;border-left:4px solid var(--green2);padding:16px 22px;margin:22px 0;
+    font-family:"Songti SC",serif;font-size:16px;color:#2c4a3b;border-radius:0 10px 10px 0}
+  .pull b{color:var(--green)}
+  .facts{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0}
+  @media(max-width:640px){.facts{grid-template-columns:1fr}}
+  .fact{background:#fbfaf6;border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+  .fact .v{font-size:22px;font-weight:800;color:var(--gold)}
+  .fact .k{font-size:12px;color:var(--sub);margin-top:4px}
+
+  footer{margin-top:56px;padding-top:22px;border-top:2px solid var(--green);font-size:12px;color:var(--faint);line-height:1.9}
+  footer b{color:var(--sub)}
+  .backtop{position:fixed;right:22px;bottom:22px;background:var(--green);color:#fff;border:none;border-radius:50%;
+    width:44px;height:44px;font-size:18px;cursor:pointer;box-shadow:0 4px 14px rgba(11,110,79,.35)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="cover">
+    <div class="kicker">Data Analysis Report · Forestry</div>
+    <h1>中国林业十年发展数据分析报告</h1>
+    <div class="sub">2015—2024 · 从"增绿"到"增收"的绿色跃迁</div>
+    <div class="meta">数据窗口：2015—2024 ｜ 编制日期：2026-11-19 ｜ 数据口径：国家统计局 · 国家林草局 · 中国林科院 · FAO</div>
+    <p class="lead">过去十年，中国森林覆盖率稳步攀升、蓄积量持续累积，林业产业产值突破十万亿元，木材对外依存度显著回落。本报告以权威公开数据为基础，用数据叙事的方式，梳理这十年"增绿"与"增收"同步推进的轨迹，并揭示森林作为"绿色资产"与"生态银行"的多维价值。</p>
+  </header>
+
+  <section class="abstract">
+    <div class="abs-card"><div class="n">25.09<small>%</small></div><div class="l">2024 森林覆盖率</div></div>
+    <div class="abs-card"><div class="n">209.88<small>亿m³</small></div><div class="l">2024 森林蓄积量</div></div>
+    <div class="abs-card"><div class="n">10.17<small>万亿</small></div><div class="l">2024 林草产业产值</div></div>
+    <div class="abs-card"><div class="n">15.88<small>万亿</small></div><div class="l">森林年生态服务价值</div></div>
+  </section>
+
+  <nav class="toc">
+    <h3>目录 CONTENTS</h3>
+    <ol>
+      <li><a href="#ch1">十年增绿 · 资源双增长</a></li>
+      <li><a href="#ch2">林地家底 · 3.24 亿公顷的构成</a></li>
+      <li><a href="#ch3">生态价值 · 看不见的财富</a></li>
+      <li><a href="#ch4">森林资产 · 25 万亿的绿色银行</a></li>
+      <li><a href="#ch5">产业腾飞 · 产值破十万亿</a></li>
+      <li><a href="#ch6">木材安全 · 依存度回落</a></li>
+      <li><a href="#ch7">世界坐标 · 中国森林的位置</a></li>
+      <li><a href="#ch8">结论与口径说明</a></li>
+    </ol>
+  </nav>
+
+  <!-- 01 -->
+  <section class="chapter" id="ch1">
+    <h2><span class="no">01</span>十年增绿 · 森林资源双增长</h2>
+    <p>森林覆盖率和森林蓄积量，是衡量一个国家森林资源规模与质量的两项核心指标。据第九次全国森林资源清查，全国森林覆盖率由第八次清查期末（2013 年）的 <span class="hl">21.63%</span> 提升至第九次清查期末（2018 年）的 <span class="hl">22.96%</span>；到 2024 年，这一数字进一步达到 <span class="hi">25.09%</span>，提前实现国家设定的 2030 年森林覆盖率 25% 目标。</p>
+    <p>与覆盖率同步，全国森林蓄积量从 2018 年的 170.58 亿立方米增长至 2024 年的 <span class="hi">209.88 亿立方米</span>，提前完成 2030 年 200 亿立方米的目標。"面积扩张"与"单产提升"共同构成了这十年森林资源的"双增长"格局。</p>
+    <div class="figure">
+      <div class="ft">图 1 ｜ 森林覆盖率与蓄积量十年增长轨迹</div>
+      <div class="fc">双轴折线 · 覆盖率(%) 与蓄积量(亿 m³)，清查年份间为线性插值估算</div>
+      <div id="fig1" class="chart"></div>
+      <div class="figNote">注：覆盖率/蓄积量为每五年一次清查的里程碑值，中间年份为线性插值（仅用于趋势演示），非官方逐年发布值。</div>
+    </div>
+    <div class="pull">森林覆盖率 <b>25.09%</b>、蓄积量 <b>209.88 亿 m³</b>——两项 2030 年国家目标均<b>提前实现</b>，中国成为全球森林资源增长最多的国家之一。</div>
+  </section>
+
+  <!-- 02 -->
+  <section class="chapter" id="ch2">
+    <h2><span class="no">02</span>林地家底 · 3.24 亿公顷的构成</h2>
+    <p>根据第九次全国森林资源清查，全国林地资源实物量约 <span class="hi">3.24 亿公顷</span>。其中乔木林是绝对主体，占林地面积的 55.57%；灌木林占 22.82%；此外还有竹林、疏林地、未成林造林地、苗圃地与宜林地等。这一结构反映出我国森林以乔木林为主、后备资源（宜林地）仍有一定储备的基本特征。</p>
+    <div class="figure">
+      <div class="ft">图 2 ｜ 全国林地资源地类构成</div>
+      <div class="fc">矩形树图 · 面积映射占比，全国林地约 3.24 亿公顷</div>
+      <div id="fig2" class="chart"></div>
+    </div>
+    <p>值得关注的是，我国<span class="hl">人工林面积约 8000 万公顷，稳居世界首位</span>。在天然林保护工程与人工林快速增长的双重作用下，森林资源的恢复速度与质量均在提升。</p>
+  </section>
+
+  <!-- 03 -->
+  <section class="chapter" id="ch3">
+    <h2><span class="no">03</span>生态价值 · 看不见的财富</h2>
+    <p>森林的价值远不止于木材。中国林科院依据第七次全国森林资源清查成果发布的《中国森林生态服务功能评估报告》显示，我国森林生态系统在涵养水源、保育土壤、固碳释氧、积累营养物质、净化大气环境与生物多样性保护等 6 项服务上的<span class="hi">年总价值约 10 万亿元</span>，大体相当于当年 GDP 的三分之一。</p>
+    <p>其中，<span class="hl">涵养水源</span>以 4.06 万亿元居首——年涵养水源量达 4947.66 亿立方米，相当于 12 个三峡水库的库容量；<span class="hl">生物多样性保护</span>2.40 万亿元、<span class="hl">固碳释氧</span>1.56 万亿元紧随其后。到 2018 年（第三期核算），森林生态服务年价值已增长至 <span class="hi">15.88 万亿元</span>，较 2013 年的 12.68 万亿元增长 25.24%。</p>
+    <div class="figure">
+      <div class="ft">图 3 ｜ 森林生态系统 6 项服务价值分解</div>
+      <div class="fc">横向条形 · 单位：万亿元/年（中国林科院，第七次清查口径）</div>
+      <div id="fig3" class="chart"></div>
+    </div>
+    <div class="facts">
+      <div class="fact"><div class="v">4947.66 亿m³</div><div class="k">年涵养水源量 ≈ 12 个三峡水库</div></div>
+      <div class="fact"><div class="v">3.59 亿吨</div><div class="k">森林年固碳量</div></div>
+      <div class="fact"><div class="v">50.01 亿吨</div><div class="k">森林年滞尘量</div></div>
+    </div>
+    <div class="figure">
+      <div class="ft">图 4 ｜ 生态服务年价值量：2013 → 2018</div>
+      <div class="fc">对比柱状 · 12.68 万亿 → 15.88 万亿元（第三期中国森林资源核算）</div>
+      <div id="fig4" class="chart short"></div>
+    </div>
+  </section>
+
+  <!-- 04 -->
+  <section class="chapter" id="ch4">
+    <h2><span class="no">04</span>森林资产 · 25 万亿的绿色银行</h2>
+    <p>国家林草局与国家统计局联合发布的第三期中国森林资源核算研究显示，截至 2018 年，全国<span class="hi">林地林木资产总价值达 25.05 万亿元</span>。其中林地资产 9.54 万亿元、林木资产 15.52 万亿元。按全国人口计算，人均拥有森林财富约 <span class="hl">1.79 万元</span>，较 2013 年增长 14.01%。</p>
+    <p>该研究还<span class="hl">首次评估了森林文化价值，约 3.10 万亿元</span>——涵盖森林提供的休闲游憩、美学与文化传承等非市场价值。这标志着森林的"绿色 GDP"核算体系正日趋完整。</p>
+    <div class="figure">
+      <div class="ft">图 5 ｜ 森林资产与文化价值构成</div>
+      <div class="fc">南丁格尔玫瑰图 · 单位：万亿元（第三期核算，基准年 2018）</div>
+      <div id="fig5" class="chart"></div>
+      <div class="figNote">注：林地资产与林木资产合计为林地林木资产总价值 25.05 万亿元；森林文化价值 3.10 万亿元为单独评估口径，不计入前者。</div>
+    </div>
+  </section>
+
+  <!-- 05 -->
+  <section class="chapter" id="ch5">
+    <h2><span class="no">05</span>产业腾飞 · 产值破十万亿</h2>
+    <p>林业产业是绿水青山转化为金山银山的重要通道。全国林业产业总产值从 2015 年的 5.94 万亿元增长至 2024 年的 <span class="hi">10.17 万亿元</span>，十年间增长约 <span class="hl">71%</span>，年均复合增速约 6.2%。2024 年林草产业产值首次突破十万亿元大关，成为支撑乡村振兴与绿色经济的重要力量。</p>
+    <p>从产业结构看，第二产业（木材加工、林产化工等）仍是产值主体，但第三产业（森林旅游与休闲）比重持续上升——森林旅游与休闲人次由 2017 年的 31 亿人次增至 2019 年的 39.06 亿人次，产业正由"卖木材"向"卖服务、卖体验"升级。</p>
+    <div class="figure">
+      <div class="ft">图 6 ｜ 林业产业总产值十年增长</div>
+      <div class="fc">渐变面积折线 · 单位：亿元（现价）</div>
+      <div id="fig6" class="chart"></div>
+    </div>
+  </section>
+
+  <!-- 06 -->
+  <section class="chapter" id="ch6">
+    <h2><span class="no">06</span>木材安全 · 依存度回落</h2>
+    <p>木材安全关乎国家资源安全。十年间，全国木材产量由 2015 年的 6832 万立方米提升至 2024 年的 <span class="hi">13740 万立方米</span>，实现翻番；同期木材进口量则由 7117 万立方米回落至 6284 万立方米。</p>
+    <p>此消彼长之下，木材对外依存度从 2015 年的 51.02%（峰值 2017 年达 54.71%）下降至 2024 年的 <span class="hi">31.38%</span>，木材自给率相应由约 49% 提升至 68.6%，超过 2030 年 65% 的目标——国内供给保障能力明显增强。</p>
+    <div class="figure">
+      <div class="ft">图 7 ｜ 木材产量、进口量与对外依存度</div>
+      <div class="fc">柱线双轴 · 产量/进口量(万 m³) 与依存度(%)</div>
+      <div id="fig7" class="chart"></div>
+    </div>
+  </section>
+
+  <!-- 07 -->
+  <section class="chapter" id="ch7">
+    <h2><span class="no">07</span>世界坐标 · 中国森林的位置</h2>
+    <p>据联合国粮农组织《全球森林资源评估 2020》（FRA 2020），全球森林面积约 40 亿公顷。中国森林面积约 2.2 亿公顷（历史口径），位居俄罗斯、巴西、加拿大、美国之后，<span class="hl">位列世界前列</span>；但森林覆盖率（22.96%，2024 年已升至 25.09%）仍低于日本、巴西、印度尼西亚等国。</p>
+    <p>将中国置于全球坐标中可见：这是一个<span class="hi">"总量大、人均少、覆盖率提升中"</span>的森林大国。过去十年的持续增绿，正是中国缩小与林业发达国家差距的扎实步伐。</p>
+    <div class="figure">
+      <div class="ft">图 8 ｜ 世界主要国家森林面积 TOP10</div>
+      <div class="fc">横向条形 · 单位：百万公顷（FAO FRA 2020），中国红色高亮</div>
+      <div id="fig8" class="chart"></div>
+    </div>
+  </section>
+
+  <!-- 08 -->
+  <section class="chapter" id="ch8">
+    <h2><span class="no">08</span>结论与口径说明</h2>
+    <p><b>主要结论。</b>过去十年，中国林业走出了一条"增绿"与"增收"协同并进的路径：森林覆盖率与蓄积量双增长并提前达成 2030 目标；林地家底以乔木林为主体、人工林面积世界第一；森林生态服务年价值达 15.88 万亿元、林地林木资产 25.05 万亿元，绿色财富可观；林业产值突破十万亿元、木材对外依存度显著回落。森林正从"资源"变为"资产"，从"绿水青山"加快转化为"金山银山"。</p>
+    <p><b>口径说明。</b>① 我国不发布"全国树木总棵数"这一指标，本报告以森林面积、蓄积量、覆盖率表征资源规模；② 覆盖率与蓄积量为每五年一次森林资源清查的里程碑值，逐年值为线性插值估算，仅供趋势演示；③ 造林面积自 2021 年起统计口径调整，跨段不可直接比较；④ 部分年份产业分项为基于占比趋势的估算；⑤ 生态服务价值（第七次清查口径约 10 万亿/年）与 2018 年核算值（15.88 万亿）口径不同，不可简单相加。</p>
+  </section>
+
+  <footer>
+    <b>数据来源：</b>国家统计局《中国统计年鉴》《国民经济和社会发展统计公报》；国家林业和草原局《中国国土绿化状况公报》《中国林业和草原发展统计公报》；中国林业信息网（lknet.ac.cn）；国家林草局、国家统计局第三期《中国森林资源核算研究》与第九次全国森林资源清查；中国林科院《中国森林生态服务功能评估报告》；国新办 2025-09-10 新闻发布会；FAO《全球森林资源评估 2020》。<br>
+    <b>配套可视化：</b>深色交互仪表盘 <a href="index.html">index.html</a>（31 类高级图表）｜ 浅色数据驾驶舱 <a href="dashboard.html">dashboard.html</a>（7 分区 14 图）。全部图表与报告数据同源，集中存于 <code>data.js</code>。<br>
+    <b>免责声明：</b>本报告为数据可视化教学与展示用途，所有数据来自公开权威来源，插值/估算值已明确标注，不作为官方统计发布。
+  </footer>
+</div>
+<button class="backtop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="返回顶部">↑</button>
+
+<script>
+const F = window.FOREST;
+const Y = F.years;
+const GC = {green:'#0b6e4f',green2:'#14996c',gold:'#b08421',ink:'#1c2b24',sub:'#5a6b62',faint:'#8a968e',red:'#b0413e',blue:'#2b6ca3'};
+const AX = {color:GC.sub,fontSize:11};
+const SPLIT = {lineStyle:{color:'#eeeade'}};
+const tb = {feature:{saveAsImage:{backgroundColor:'#fff'},dataView:{}},right:6,top:0,iconStyle:{borderColor:'#8a968e'}};
+const pal = ['#0b6e4f','#14996c','#b08421','#2b6ca3','#7b5ea7','#b0413e','#4a9d8e'];
+const figs=[];
+const fig=(id)=>{const c=echarts.init(document.getElementById(id),null,{renderer:'canvas'});figs.push(c);return c;};
+
+/* 图1 覆盖率与蓄积量双轴 */
+(function(){
+  const c=fig('fig1');
+  c.setOption({toolbox:tb,tooltip:{trigger:'axis'},
+    legend:{data:['森林覆盖率','森林蓄积量'],top:0,textStyle:{color:GC.sub}},
+    grid:{left:52,right:58,top:40,bottom:36},
+    xAxis:{type:'category',data:Y.map(String),axisLabel:AX,boundaryGap:false},
+    yAxis:[{type:'value',name:'%',min:20,max:27,axisLabel:AX,nameTextStyle:{color:GC.faint},splitLine:SPLIT},
+           {type:'value',name:'亿m³',min:140,max:220,axisLabel:AX,nameTextStyle:{color:GC.faint},splitLine:{show:false}}],
+    series:[
+      {name:'森林覆盖率',type:'line',smooth:true,data:F.coverageEst,lineStyle:{color:GC.green,width:3},itemStyle:{color:GC.green},symbolSize:7,
+       areaStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(11,110,79,.22)'},{offset:1,color:'rgba(11,110,79,0)'}])},
+       markLine:{silent:true,symbol:'none',data:[{yAxis:25,label:{formatter:'2030目标 25%',color:GC.red,fontSize:11},lineStyle:{color:GC.red,type:'dashed'}}]}},
+      {name:'森林蓄积量',type:'line',yAxisIndex:1,smooth:true,data:F.stockEst,lineStyle:{color:GC.gold,width:3},itemStyle:{color:GC.gold},symbolSize:7}]});
+})();
+
+/* 图2 林地结构 矩形树图 */
+(function(){
+  const c=fig('fig2');
+  const data=Object.entries(F.landStructure).map(([n,v])=>({name:n,value:+v.toFixed(0)}));
+  c.setOption({toolbox:tb,tooltip:{formatter:p=>`${p.name}<br/>${p.value} 万公顷（${(p.value/32400*100).toFixed(1)}%）`},
+    series:[{type:'treemap',data,roam:false,nodeClick:false,breadcrumb:{show:false},
+      label:{fontSize:13,color:'#fff',formatter:p=>`${p.name}\n${(p.value/32400*100).toFixed(1)}%`},
+      itemStyle:{borderColor:'#fff',borderWidth:2,gapWidth:2},color:pal}]});
+})();
+
+/* 图3 生态服务价值 6 项 横向条形 */
+(function(){
+  const c=fig('fig3');
+  const arr=[...F.ecoServiceBreakdown].sort((a,b)=>a.value-b.value);
+  c.setOption({toolbox:tb,tooltip:{trigger:'axis',axisPointer:{type:'shadow'},formatter:p=>`${p.name}<br/>${p.value} 万亿元/年`},
+    grid:{left:110,right:56,top:10,bottom:26},
+    xAxis:{type:'value',axisLabel:{...AX,formatter:'{value}'},splitLine:SPLIT},
+    yAxis:{type:'category',data:arr.map(x=>x.name),axisLabel:{color:GC.ink,fontSize:12}},
+    series:[{type:'bar',data:arr.map(x=>x.value),barWidth:'58%',
+      itemStyle:{color:p=>pal[p.dataIndex%pal.length],borderRadius:[0,5,5,0]},
+      label:{show:true,position:'right',formatter:'{c} 万亿',color:GC.sub,fontSize:11}}]});
+})();
+
+/* 图4 生态服务年价值 2013 vs 2018 */
+(function(){
+  const c=fig('fig4');
+  c.setOption({toolbox:tb,tooltip:{trigger:'axis',formatter:p=>`${p[0].axisValue}<br/>${p[0].value} 万亿元/年`},
+    grid:{left:52,right:20,top:16,bottom:28},
+    xAxis:{type:'category',data:['2013 年','2018 年'],axisLabel:{color:GC.ink,fontSize:13}},
+    yAxis:{type:'value',name:'万亿元/年',min:0,max:18,axisLabel:AX,nameTextStyle:{color:GC.faint},splitLine:SPLIT},
+    series:[{type:'bar',data:[
+        {value:12.68,itemStyle:{color:'#9db9a9'}},
+        {value:15.88,itemStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#14996c'},{offset:1,color:'#0b6e4f'}])}}],
+      barWidth:'42%',
+      label:{show:true,position:'top',formatter:'{c}',color:GC.green,fontSize:13,fontWeight:'bold'},
+      itemStyle:{borderRadius:[6,6,0,0]}}]});
+})();
+
+/* 图5 森林资产 南丁格尔玫瑰图 */
+(function(){
+  const c=fig('fig5');
+  const cap=F.forestCapital;
+  const data=[
+    {name:'林木资产',value:cap.timberAsset},
+    {name:'林地资产',value:cap.forestLand},
+    {name:'森林文化价值(单列)',value:cap.culturalValue},
+  ];
+  c.setOption({toolbox:tb,tooltip:{trigger:'item',formatter:p=>`${p.name}<br/>${p.value} 万亿元`},
+    legend:{bottom:4,textStyle:{color:GC.sub,fontSize:11},data:data.map(x=>x.name)},
+    series:[{type:'pie',radius:[20,'72%'],center:['50%','48%'],roseType:'area',
+      itemStyle:{borderRadius:6,borderColor:'#fff',borderWidth:2},
+      label:{formatter:p=>`${p.name}\n${p.value} 万亿`,color:GC.ink,fontSize:11},
+      data:data.map((x,i)=>({...x,itemStyle:{color:pal[i]}}))}]});
+})();
+
+/* 图6 产值增长 渐变面积 */
+(function(){
+  const c=fig('fig6');
+  c.setOption({toolbox:tb,tooltip:{trigger:'axis',formatter:p=>`${p[0].axisValue}<br/>${p[0].value.toLocaleString()} 亿元`},
+    grid:{left:60,right:20,top:16,bottom:30},
+    xAxis:{type:'category',data:Y.map(String),axisLabel:AX,boundaryGap:false},
+    yAxis:{type:'value',name:'亿元',axisLabel:AX,nameTextStyle:{color:GC.faint},splitLine:SPLIT},
+    series:[{type:'line',smooth:true,data:F.outputValue,lineStyle:{color:GC.green,width:3},itemStyle:{color:GC.green},symbolSize:8,
+      label:{show:true,position:'top',formatter:p=>p.value>=10000?(p.value/10000).toFixed(1)+'万亿':p.value,color:GC.green,fontSize:10},
+      areaStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(20,153,108,.35)'},{offset:1,color:'rgba(20,153,108,.02)'}])} }]});
+})();
+
+/* 图7 木材产量/进口/依存度 */
+(function(){
+  const c=fig('fig7');
+  c.setOption({toolbox:tb,tooltip:{trigger:'axis'},
+    legend:{data:['木材产量','进口量','对外依存度'],top:0,textStyle:{color:GC.sub,fontSize:11}},
+    grid:{left:56,right:52,top:40,bottom:30},
+    xAxis:{type:'category',data:Y.map(String),axisLabel:AX},
+    yAxis:[{type:'value',name:'万m³',axisLabel:AX,nameTextStyle:{color:GC.faint},splitLine:SPLIT},
+           {type:'value',name:'%',min:20,max:60,axisLabel:{...AX,formatter:'{value}%'},nameTextStyle:{color:GC.faint},splitLine:{show:false}}],
+    series:[
+      {name:'木材产量',type:'bar',data:F.timber,barWidth:'34%',itemStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#14996c'},{offset:1,color:'#0b6e4f'}]),borderRadius:[3,3,0,0]}},
+      {name:'进口量',type:'bar',data:F.timberImport,barWidth:'34%',itemStyle:{color:'#c9a227',borderRadius:[3,3,0,0]}},
+      {name:'对外依存度',type:'line',yAxisIndex:1,smooth:true,data:F.timberDependency,lineStyle:{color:GC.red,width:3},itemStyle:{color:GC.red},symbolSize:6}]});
+})();
+
+/* 图8 世界森林面积 TOP10 横向条形 */
+(function(){
+  const c=fig('fig8');
+  const arr=[...F.worldForest].sort((a,b)=>a.area-b.area);
+  c.setOption({toolbox:tb,tooltip:{trigger:'axis',axisPointer:{type:'shadow'},
+      formatter:p=>{const d=arr[p.dataIndex];return `${d.name}<br/>森林面积 ${d.area} 百万 ha<br/>覆盖率 ${d.coverage}%`;}},
+    grid:{left:70,right:56,top:10,bottom:26},
+    xAxis:{type:'value',axisLabel:AX,splitLine:SPLIT},
+    yAxis:{type:'category',data:arr.map(x=>x.name),axisLabel:{color:GC.ink,fontSize:11}},
+    series:[{type:'bar',data:arr.map(x=>x.area),barWidth:'60%',
+      itemStyle:{color:p=>arr[p.dataIndex].name==='中国'?GC.red:pal[p.dataIndex%pal.length],borderRadius:[0,4,4,0]},
+      label:{show:true,position:'right',formatter:'{c}',color:GC.sub,fontSize:10}}]});
+})();
+
+window.addEventListener('resize',()=>figs.forEach(c=>c.resize()));
+</script>
+</body>
+</html>
