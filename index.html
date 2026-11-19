@@ -570,7 +570,6 @@ function applyYear(i){
   gauge.setOption({series:[{data:[{value:+F.coverageEst[i], name:y+' 年森林覆盖率(估)'}]}]});
   updateRead(i);
 }
-applyYear(curIndex);
 
 /* ---------- 驾驶舱 · 数据速读（联动时间轴） ---------- */
 const dep = F.timberDependency;          // 对外依存度 %
@@ -588,6 +587,7 @@ function updateRead(i){
     `森林覆盖率估计达 <b>${cov}%</b>${cov>=25?'，已提前实现 2030 年 25% 目标':''}，森林蓄积量约 <span class="n">${stk}</span> 亿 m³，生态家底进一步厚植；` +
     `当年造林面积 <b>${aff}</b> 万公顷，国土绿化稳步推进。`;
 }
+applyYear(curIndex); // 在 dep/base/updateRead 就绪后初始化，避免 TDZ
 
 /* ---------- ⑤ 桑基图 ---------- */
 const sankey=echarts.init(document.getElementById('sankeyChart'),'dark');
