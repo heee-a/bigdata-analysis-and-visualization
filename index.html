@@ -473,11 +473,12 @@ tl.setOption({
     controlStyle:{color:C.cyan,borderColor:C.cyan}}},
   options:tlOptions
 });
-document.getElementById('yearLabel').textContent='当前年份：'+years[tl.getCurrentOption().baseOption.timeline.currentIndex];
-tl.on('timelinechanged',e=>{applyYear(e.currentIndex);});
+let curIndex=0, isPlaying=true; // 自维护时间轴状态，避免依赖 getCurrentOption（本地 ECharts 版本行为差异）
+document.getElementById('yearLabel').textContent='当前年份：'+years[curIndex];
+tl.on('timelinechanged',e=>{curIndex=e.currentIndex;applyYear(curIndex);});
 const playBtn=document.getElementById('playBtn'), resetBtn=document.getElementById('resetBtn');
-playBtn.onclick=()=>{ const o=tl.getCurrentOption().baseOption.timeline; if(o.autoPlay){tl.setOption({baseOption:{timeline:{autoPlay:false}}});playBtn.textContent='▶ 播放';} else {tl.setOption({baseOption:{timeline:{autoPlay:true}}});playBtn.textContent='⏸ 暂停';} };
-resetBtn.onclick=()=>{tl.setOption({baseOption:{timeline:{currentIndex:0,autoPlay:false}}});playBtn.textContent='▶ 播放';applyYear(0);};
+playBtn.onclick=()=>{isPlaying=!isPlaying;tl.setOption({baseOption:{timeline:{autoPlay:isPlaying}}});playBtn.textContent=isPlaying?'⏸ 暂停':'▶ 播放';};
+resetBtn.onclick=()=>{curIndex=0;isPlaying=false;tl.setOption({baseOption:{timeline:{currentIndex:0,autoPlay:false}}});playBtn.textContent='▶ 播放';applyYear(0);};
 
 /* ---------- ② 中国省级地图 ---------- */
 const mapChart=echarts.init(document.getElementById('mapChart'),'dark');
@@ -569,7 +570,7 @@ function applyYear(i){
   gauge.setOption({series:[{data:[{value:+F.coverageEst[i], name:y+' 年森林覆盖率(估)'}]}]});
   updateRead(i);
 }
-applyYear(tl.getCurrentOption().baseOption.timeline.currentIndex);
+applyYear(curIndex);
 
 /* ---------- 驾驶舱 · 数据速读（联动时间轴） ---------- */
 const dep = F.timberDependency;          // 对外依存度 %
