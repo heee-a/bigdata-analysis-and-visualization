@@ -397,7 +397,7 @@
 <script src="data.js"></script>
 <script>
 const F = window.FOREST;
-const C = {green:'#2ee6a0',cyan:'#36d3ff',gold:'#ffd166',purple:'#a78bfa',pink:'#ff7eb6',orange:'#ff9f5a',sub:'#9fb0cc'};
+const C = {green:'#2ee6a0',green2:'#19c37d',cyan:'#36d3ff',gold:'#ffd166',purple:'#a78bfa',pink:'#ff7eb6',orange:'#ff9f5a',sub:'#9fb0cc'};
 // 通用工具栏：数据视图 + 保存图片
 const tb = {show:true,right:14,top:6,iconStyle:{borderColor:C.sub},
   feature:{dataView:{show:true,readOnly:false,title:'数据',lang:['数据视图','关闭','刷新']},
@@ -508,7 +508,7 @@ function renderMap(geo){
 }
 fetch('https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json')
   .then(r=>r.json()).then(renderMap)
-  .catch(()=>{document.getElementById('mapLoad').textContent='⚠ 地图边界加载失败（需联网）。请联网后刷新，其余图表不受影响。';});
+  .catch(()=>{const m=document.getElementById('mapLoad');if(m)m.textContent='⚠ 地图边界加载失败（需联网）。请联网后刷新，其余图表不受影响。';});
 
 /* ---------- ③ 雷达 ---------- */
 const radar=echarts.init(document.getElementById('radarChart'),'dark');
