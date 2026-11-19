@@ -102,6 +102,7 @@ python -m http.server 8080
 > - 深色主仪表盘（GitHub Pages）：`https://heee-a.github.io/bigdata-analysis-and-visualization/`
 > - 浅色可视化大屏：`https://heee-a.github.io/bigdata-analysis-and-visualization/dashboard.html`（或点主仪表盘右上角"🖥 可视化大屏"按钮）
 > - 图文数据分析报告：`https://heee-a.github.io/bigdata-analysis-and-visualization/report.html`（白皮书风格，8 章节叙事 + 8 张配套图表；或点右上角"📄 数据分析报告"按钮）
+> - 十年发展大事记：`https://heee-a.github.io/bigdata-analysis-and-visualization/timeline.html`（时间轴叙事，11 条政策里程碑 + 5 个国家公园名录 + 2 图；或点右上角"🕰 发展大事记"按钮）
 
 ---
 
@@ -123,6 +124,7 @@ python -m http.server 8080
 ├── dashboard.html      # 可视化大屏（浅色驾驶舱风格：标题栏+核心数字+年份切换+6张KPI卡+数据速读+7分区14图：
                         #   森林资源结构/生态格局/产业经济/木材供给/生态效益/世界视野/森林质量韧性，与主页同源数据）
 ├── report.html         # 图文叙事式数据分析报告（白皮书风格：封面/摘要/目录 + 8章节正文 + 8张配套图表 + 口径说明）
+├── timeline.html       # 十年发展大事记（深色时间轴：11条政策里程碑 + 首批5个国家公园名录卡片 + 事件数/面积2图）
 ├── data.js             # 结构化数据集（含来源与口径注释）
 ├── assets/
 │   ├── echarts.min.js         # ECharts 5.5.0 本地库（避免 CDN 依赖，确保离线/全球可渲染）
