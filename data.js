@@ -82,6 +82,15 @@ const FOREST = {
   forestAsset: 25.05,
   // 国家公园数量（2024）：首批 5 个
   nationalParks: 5,
+  // 首批国家公园明细（2021-10-12 正式设立，来源：国家林草局）
+  nationalParkList: [
+    { name: '三江源国家公园', province: '青海', area: 19.07, feature: '长江/黄河/澜沧江源，中华水塔' },
+    { name: '大熊猫国家公园', province: '四川/陕西/甘肃', area: 2.71, feature: '大熊猫旗舰物种保护' },
+    { name: '东北虎豹国家公园', province: '吉林/黑龙江', area: 1.41, feature: '东北虎、东北豹种群恢复' },
+    { name: '海南热带雨林国家公园', province: '海南', area: 0.43, feature: '热带雨林与海南长臂猿' },
+    { name: '武夷山国家公园', province: '福建/江西', area: 0.10, feature: '亚热带常绿阔叶林与生物多样性' },
+  ],
+  nationalParkNote: '2021-10-12 正式设立首批 5 个国家公园，保护面积约 23 万 km²，涵盖近 30% 陆域国家重点保护野生动植物种类。各园面积为约数。',
   // 林草产业年产值（2024，万亿元，突破 10 万亿）
   greenIndustry: 10.17,
 
