@@ -181,10 +181,35 @@
     </div>
   </div>
 
+  <!-- 分区 6：世界视野 -->
+  <div class="sec">
+    <div class="sec-hd"><span class="no">6</span><h2>世界森林视野</h2>
+      <span class="desc">全球 TOP 国家 · 面积与覆盖率国际比较（FAO FRA 2020）</span><span class="line"></span></div>
+    <div class="grid2">
+      <div class="card"><h3>世界主要国家森林面积 TOP10</h3>
+        <div class="sub">横向条形 · 百万公顷，中国森林面积居世界前列（红）</div><div id="ch_world" class="chart"></div></div>
+      <div class="card"><h3>森林面积 × 覆盖率国际定位</h3>
+        <div class="sub">气泡散点 · 面积(百万 ha) 与覆盖率(%)，中国"总量大、覆盖率提升中"（红）</div><div id="ch_world2" class="chart"></div></div>
+    </div>
+  </div>
+
+  <!-- 分区 7：森林质量与供给韧性 -->
+  <div class="sec">
+    <div class="sec-hd"><span class="no">7</span><h2>森林质量与供给韧性</h2>
+      <span class="desc">单位面积蓄积量 · 木材自给率（由真实序列派生）</span><span class="line"></span></div>
+    <div class="grid2">
+      <div class="card"><h3>森林单位面积蓄积量趋势</h3>
+        <div class="sub">蓄积量 ÷ 森林面积派生 · m³/ha，反映森林质量稳步提升</div><div id="ch_quality" class="chart"></div></div>
+      <div class="card"><h3>木材自给率演变</h3>
+        <div class="sub">国产 ÷ (国产+进口) 派生 · 与对外依存度互补，自给率持续回升</div><div id="ch_self" class="chart"></div></div>
+    </div>
+  </div>
+
   <footer>
     <b>数据来源：</b>国家统计局、国家林业和草原局、中国林业信息网、第九次全国森林资源清查、国新办 2025-09-10 发布会。<br>
     <b>口径说明：</b>我国不发布"全国树木总棵数"，以森林面积/蓄积量/覆盖率表征资源规模；覆盖率与蓄积量的逐年值为清查年份间线性插值（仅趋势演示）；造林面积 2021 起口径调整，跨段不可直接比较。<br>
-    <b>同源项目：</b>完整 31 类高级交互图表版见 <a href="index.html">index.html</a>。本页为浅色驾驶舱风格可视化大屏。
+    <b>世界数据：</b>FAO《全球森林资源评估 2020》(FRA 2020)；单位面积蓄积量、木材自给率由本页真实序列派生计算。<br>
+    <b>同源项目：</b>完整 31 类高级交互图表版见 <a href="index.html">index.html</a>。本页为浅色驾驶舱风格可视化大屏（7 大分区 14 张图表）。
   </footer>
 </div>
 
@@ -400,6 +425,65 @@ const charts=[];
     detail:{valueAnimation:true,offsetCenter:[0,'18%'],fontSize:15,color:pal[i],fontWeight:800,
       formatter:v=>v+(it.unit==='%'?'%':'')},
     data:[{value:it.value,name:it.name}]}))});
+})();
+
+/* 6 世界森林面积 TOP10 · 横向条形 */
+(function(){
+  const c=ch('ch_world');charts.push(c);
+  const arr=[...F.worldForest].sort((a,b)=>a.area-b.area); // 升序，yAxis 自下而上
+  c.setOption({toolbox:tb,tooltip:{trigger:'axis',axisPointer:{type:'shadow'},
+      formatter:p=>{const d=arr[p.dataIndex];return `${d.name}<br/>森林面积 ${d.area} 百万 ha<br/>覆盖率 ${d.coverage}%`;}},
+    grid:{left:66,right:52,top:10,bottom:22},
+    xAxis:{type:'value',axisLabel:{...AX,formatter:'{value}'},splitLine:SPLIT},
+    yAxis:{type:'category',data:arr.map(x=>x.name),axisLabel:{color:'#475569',fontSize:10}},
+    series:[{type:'bar',data:arr.map(x=>x.area),barWidth:'62%',
+      itemStyle:{color:p=>arr[p.dataIndex].name==='中国'?'#dc2626':pal[p.dataIndex%pal.length],borderRadius:[0,4,4,0]},
+      label:{show:true,position:'right',formatter:'{c}',color:'#475569',fontSize:9}}]});
+})();
+
+/* 6 世界森林 面积×覆盖率 · 气泡散点 */
+(function(){
+  const c=ch('ch_world2');charts.push(c);
+  const data=F.worldForest.map(x=>({name:x.name,value:[x.area,x.coverage,x.area]}));
+  c.setOption({toolbox:tb,tooltip:{trigger:'item',formatter:p=>`${p.name}<br/>森林面积 ${p.value[0]} 百万 ha<br/>覆盖率 ${p.value[1]}%`},
+    grid:{left:52,right:20,top:14,bottom:38},
+    xAxis:{type:'value',name:'森林面积 (百万 ha)',nameLocation:'middle',nameGap:24,axisLabel:AX,
+      nameTextStyle:{color:'#94a3b8',fontSize:10},splitLine:SPLIT},
+    yAxis:{type:'value',name:'覆盖率 %',axisLabel:{...AX,formatter:'{value}%'},
+      nameTextStyle:{color:'#94a3b8',fontSize:10},splitLine:SPLIT},
+    series:[{type:'scatter',data,
+      symbolSize:v=>8+Math.sqrt(v[2])*1.7,
+      itemStyle:{color:p=>p.name==='中国'?'#dc2626':'rgba(15,157,118,.7)',borderColor:'#fff',borderWidth:1.5},
+      label:{show:true,position:'top',formatter:p=>p.name,color:'#475569',fontSize:9}}]});
+})();
+
+/* 7 单位面积蓄积量 · 折线（派生） */
+(function(){
+  const c=ch('ch_quality');charts.push(c);
+  // stockEst 亿m³ / areaEst 万公顷 → m³/ha：*1e8/1e4=*1e4；再换算：亿m³/万ha = 1e4 m³/ha
+  const q=F.stockEst.map((s,i)=>+(s/F.areaEst[i]*1e4).toFixed(1));
+  c.setOption({toolbox:tb,tooltip:{trigger:'axis',formatter:p=>`${p[0].axisValue}<br/>单位面积蓄积量 ${p[0].value} m³/ha（估算）`},
+    grid:{left:52,right:16,top:14,bottom:24},
+    xAxis:{type:'category',data:Y.map(String),axisLabel:AX,boundaryGap:false},
+    yAxis:{type:'value',name:'m³/ha',axisLabel:AX,nameTextStyle:{color:'#94a3b8',fontSize:10},splitLine:SPLIT},
+    series:[{type:'line',smooth:true,data:q,lineStyle:{color:'#0f9d76',width:3},itemStyle:{color:'#0f9d76'},symbolSize:7,
+      label:{show:true,position:'top',color:'#0f9d76',fontSize:9,formatter:'{c}'},
+      areaStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(15,157,118,.28)'},{offset:1,color:'rgba(15,157,118,0)'}])} }]});
+})();
+
+/* 7 木材自给率 · 折线（派生） */
+(function(){
+  const c=ch('ch_self');charts.push(c);
+  const s=F.timber.map((t,i)=>+(t/(t+F.timberImport[i])*100).toFixed(1));
+  c.setOption({toolbox:tb,tooltip:{trigger:'axis',formatter:p=>`${p[0].axisValue}<br/>木材自给率 ${p[0].value}%`},
+    grid:{left:46,right:16,top:14,bottom:24},
+    xAxis:{type:'category',data:Y.map(String),axisLabel:AX,boundaryGap:false},
+    yAxis:{type:'value',name:'%',min:40,max:75,axisLabel:{...AX,formatter:'{value}%'},
+      nameTextStyle:{color:'#94a3b8',fontSize:10},splitLine:SPLIT},
+    series:[{type:'line',smooth:true,data:s,lineStyle:{color:'#2563eb',width:3},itemStyle:{color:'#2563eb'},symbolSize:7,
+      label:{show:true,position:'top',color:'#2563eb',fontSize:9,formatter:'{c}%'},
+      markLine:{silent:true,symbol:'none',data:[{yAxis:65,label:{formatter:'2030目标 65%',color:'#dc2626',fontSize:10},lineStyle:{color:'#dc2626',type:'dashed'}}]},
+      areaStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(37,99,235,.28)'},{offset:1,color:'rgba(37,99,235,0)'}])} }]});
 })();
 
 window.addEventListener('resize',()=>charts.forEach(c=>c.resize()));
