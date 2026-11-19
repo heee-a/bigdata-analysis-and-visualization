@@ -101,6 +101,7 @@ python -m http.server 8080
 > **在线仓库 / 演示**：GitHub 仓库 `heee-a/bigdata-analysis-and-visualization`（中文名可在仓库 Settings → Repository name 中改回"大数据分析及数据可视化"）。
 > - 深色主仪表盘（GitHub Pages）：`https://heee-a.github.io/bigdata-analysis-and-visualization/`
 > - 浅色可视化大屏：`https://heee-a.github.io/bigdata-analysis-and-visualization/dashboard.html`（或点主仪表盘右上角"🖥 可视化大屏"按钮）
+> - 图文数据分析报告：`https://heee-a.github.io/bigdata-analysis-and-visualization/report.html`（白皮书风格，8 章节叙事 + 8 张配套图表；或点右上角"📄 数据分析报告"按钮）
 
 ---
 
@@ -110,6 +111,7 @@ python -m http.server 8080
 2. **森林覆盖率 / 蓄积量 / 面积**来自每 5 年一次的全国森林资源清查。图中"插值估算"的年度值（如 `coverageEst`、`stockEst`）仅为满足"逐年展示"趋势演示而做的**线性插值**，并非官方年度值，已在页面与数据文件中明确标注。
 3. **造林面积**自 **2021 年起统计口径调整**（国土绿化公报口径），与 2020 年及以前的"造林总面积（含封山育林、退化林修复等）"**不可直接比较**，页面已加注说明。
 4. 三次产业产值 2023 年为基于占比趋势的估算值，已在 `data.js` 标注。
+5. 森林生态服务价值 6 项分解（约 10 万亿/年）来自中国林科院第七次清查口径；2018 年核算值 15.88 万亿来自第三期核算。**两者口径与基准年不同，不可简单相加或替换**。林地林木资产 25.05 万亿、森林文化价值 3.10 万亿均为 2018 年基准的核算值。
 
 ---
 
@@ -120,6 +122,7 @@ python -m http.server 8080
 ├── index.html          # 主仪表盘（ECharts，31 类高级图表 + KPI驾驶舱 + 数据速读 + 数据总表 + 目录导航 + 时间轴联动 + 数据故事）
 ├── dashboard.html      # 可视化大屏（浅色驾驶舱风格：标题栏+核心数字+年份切换+6张KPI卡+数据速读+7分区14图：
                         #   森林资源结构/生态格局/产业经济/木材供给/生态效益/世界视野/森林质量韧性，与主页同源数据）
+├── report.html         # 图文叙事式数据分析报告（白皮书风格：封面/摘要/目录 + 8章节正文 + 8张配套图表 + 口径说明）
 ├── data.js             # 结构化数据集（含来源与口径注释）
 ├── assets/
 │   ├── echarts.min.js         # ECharts 5.5.0 本地库（避免 CDN 依赖，确保离线/全球可渲染）
